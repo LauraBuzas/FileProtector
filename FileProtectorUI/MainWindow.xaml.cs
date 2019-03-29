@@ -13,10 +13,12 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Runtime.InteropServices;
+using MahApps.Metro.Controls.Dialogs;
+using MahApps.Metro.Controls;
 
 namespace FileProtectorUI
 {
-    public partial class MainWindow
+    public partial class MainWindow 
     {
         [DllImport("FileProtectorCore.dll")]
         static extern int function();
@@ -62,18 +64,26 @@ namespace FileProtectorUI
             }
         }
 
-        private void RemoveButtonClick(object sender, RoutedEventArgs e)
+        private async void RemoveButtonClick(object sender, RoutedEventArgs e)
         {
             FileDTO selectedFile = filesList.SelectedItem as FileDTO;
             if(selectedFile != null)
             {
-                Console.WriteLine();
+                //TODO remove file from db/list
+            } else
+            {
+                await this.ShowMessageAsync("No file was selected", "Please go back and select a file to be removed");
             }
         }
 
         private void PopulateFilesList()
         {
             filesList.ItemsSource = protectedFiles.GetProtectedFiles();
+        }
+
+        private void StackPanel_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            var panel = sender as System.Windows.Controls.StackPanel;
         }
     }
 }

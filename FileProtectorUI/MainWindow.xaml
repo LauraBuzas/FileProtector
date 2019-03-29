@@ -6,6 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="File Protector" 
+        TitleForeground="White"
         Height="450" 
         Width="800"
         >
@@ -29,7 +30,7 @@
                         <ListBox Name="filesList" Margin="20" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
-                                        <StackPanel>
+                                        <StackPanel MouseUp="StackPanel_MouseUp">
                                             <TextBlock Foreground="{StaticResource Foreground}" FontSize="30" Text="{Binding Name}"/>
                                             <TextBlock Foreground="{StaticResource Foreground}" FontSize="16" Text="{Binding Path}"/>
                                             <TextBlock Foreground="{StaticResource Foreground}" FontSize="16" Text="{Binding DateAdded}"/>
