@@ -4,6 +4,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+        xmlns:dynamicVisibility="clr-namespace:LiveCharts.Wpf.Converters;assembly=LiveCharts.Wpf"
         mc:Ignorable="d"
         Title="File Protector" 
         TitleForeground="White"
@@ -11,7 +13,6 @@
         Width="800"
         >
     <Window.Resources>
-        
     </Window.Resources>
     <DockPanel>
         <Grid>
@@ -40,13 +41,68 @@
                         </ListBox>
                     </DockPanel>
                 </TabItem>
+                <TabItem Header="History">
+                    <DockPanel>
+                        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button Margin="0,0,15,15" Height="30" Width="200" HorizontalAlignment="Right" Click="ShowToastNotification">Show Notification</Button>
+                        </StackPanel>
+                        <ListBox Name="historyList" Margin="20" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel MouseUp="StackPanel_MouseUp">
+                                        <TextBlock Foreground="{StaticResource Foreground}" FontSize="30" Text="{Binding Name}"/>
+                                        <TextBlock Foreground="{StaticResource Foreground}" FontSize="16" Text="{Binding Path}"/>
+                                        <TextBlock Foreground="{StaticResource Foreground}" FontSize="16" Text="{Binding DateAdded}"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </DockPanel>
+                </TabItem>
                 <TabItem Header="Settings">
                     <TabItem.Content>
                         <Grid></Grid>
                     </TabItem.Content>
                 </TabItem>
-                <TabItem VerticalAlignment="Bottom" Header="Help">
-
+                <TabItem Header="Stats">
+                    <TabItem.Content>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition Height="*"></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox IsChecked="{Binding MariaSeriesVisibility}">
+                                    Maria Series
+                                </CheckBox>
+                                <CheckBox IsChecked="{Binding CharlesSeriesVisibility}">
+                                    Charles Series
+                                </CheckBox>
+                                <CheckBox IsChecked="{Binding JohnSeriesVisibility}">
+                                    John Series
+                                </CheckBox>
+                            </StackPanel>
+                            <lvc:CartesianChart Grid.Row="1" Hoverable="False">
+                                <lvc:CartesianChart.Series>
+                                    <lvc:ColumnSeries Title="Maria" Values="4,7,2,9,3" Visibility="{Binding MariaSeriesVisibility, Mode=OneWay}" MaxWidth="1000" ColumnPadding="0"/>
+                                    <lvc:ColumnSeries Title="Charles" Values="6,2,6,3,8" Visibility="{Binding CharlesSeriesVisibility, Mode=OneWay}" MaxWidth="1000" ColumnPadding="0"/>
+                                    <lvc:ColumnSeries Title="John" Values="7,2,8,3,9" Visibility="{Binding JohnSeriesVisibility, Mode=OneWay}" MaxWidth="1000" ColumnPadding="0"/>
+                                </lvc:CartesianChart.Series>
+                                <lvc:CartesianChart.AxisX>
+                                    <lvc:Axis Labels="January, February, March, April, May">
+                                        <lvc:Axis.Separator>
+                                            <lvc:Separator Step="1"></lvc:Separator>
+                                        </lvc:Axis.Separator>
+                                    </lvc:Axis>
+                                </lvc:CartesianChart.AxisX>
+                            </lvc:CartesianChart>
+                        </Grid>
+                    </TabItem.Content>
+                </TabItem>
+                <TabItem Header="Help">
+                    <TabItem.Content>
+                        <Grid></Grid>
+                    </TabItem.Content>
                 </TabItem>
             </TabControl>
         </Grid>

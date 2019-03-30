@@ -15,8 +15,37 @@
                 
                 <ResourceDictionary Source="pack://application:,,,/Selen.Wpf.Core;component/Resources.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/Selen.Wpf.SystemStyles;component/Styles.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
+                <!--Metro colors-->
+                <ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/Colors/metro.xaml" />
+                <!--Blue gradient-->
+                <!--<ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/Colors/blue.xaml" />-->
+                <!--white gradient-->
+                <!--<ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/Colors/white.xaml" />-->
+                <!--black gradient-->
+                <!--<ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/Colors/black.xaml" />-->
 
+
+                <!--Select size, options are small, medium and large-->
+
+                <!--small-->
+                <!--<ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/Size/s.xaml" />-->
+                <!--medium-->
+                <ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/Size/m.xaml" />
+                <!--large-->
+                <!--<ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/Size/l.xaml" />-->
+
+
+                <!--Select weight, options are light, normal and bold-->
+
+                <!--light-->
+                <!--<ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/Weight/light.xaml" />-->
+                <!--normal-->
+                <ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/Weight/normal.xaml" />
+                <!--bold-->
+                <!--<ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/Weight/bold.xaml" />-->
+
+            </ResourceDictionary.MergedDictionaries>
+            
 
             <!-- This style is from Selen, but without the closing button-->
             <Style TargetType="{x:Type TabControl}" x:Key="TabControlStyle">
