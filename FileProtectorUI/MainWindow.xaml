@@ -16,13 +16,47 @@
     </Window.Resources>
     <DockPanel>
         <Grid>
-            <TabControl Style="{StaticResource TabControlStyle}">
-                <TabItem Header="Home">
+            <TabControl Style="{StaticResource TabControlStyle}" Name="mainTabControl">
+                <TabItem Header="Home" Name="HomeTab">
                     <TabItem.Content>
-                        <Grid></Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" MouseDown="StackPanelMyFilesMouseDown">
+                                <TextBlock  Foreground="{StaticResource Foreground}"  HorizontalAlignment="Center" FontFamily="Segoe MDL2 Assets" FontSize="60" Text="&#xED25;"/>
+                                <TextBlock Foreground="{StaticResource Foreground}" HorizontalAlignment="Center" FontSize="30" Text="My Files"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1"  HorizontalAlignment="Center" VerticalAlignment="Center" MouseDown="StackPanelHistoryMouseDown">
+                                <TextBlock Foreground="{StaticResource Foreground}"  HorizontalAlignment="Center" FontFamily="Segoe MDL2 Assets" FontSize="60" Text="&#xE81C;"/>
+                                <TextBlock Foreground="{StaticResource Foreground}" HorizontalAlignment="Center" FontSize="30" Text="History"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" MouseDown="StackPanelStatisticsMouseDown">
+                                <TextBlock Foreground="{StaticResource Foreground}"  HorizontalAlignment="Center" FontFamily="Segoe MDL2 Assets" FontSize="60" Text="&#xE95E;"/>
+                                <TextBlock Foreground="{StaticResource Foreground}" HorizontalAlignment="Center" FontSize="30" Text="Statistics"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" MouseDown="StackPanelSettingsMouseDown">
+                                <TextBlock Foreground="{StaticResource Foreground}"  HorizontalAlignment="Center" FontFamily="Segoe MDL2 Assets" FontSize="60" Text="&#xE713;"/>
+                                <TextBlock Foreground="{StaticResource Foreground}" HorizontalAlignment="Center" FontSize="30" Text="Settings"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" MouseDown="StackPanelHelpMouseDown">
+                                <TextBlock Foreground="{StaticResource Foreground}"  HorizontalAlignment="Center" FontFamily="Segoe MDL2 Assets" FontSize="60" Text="&#xE946;"/>
+                                <TextBlock Foreground="{StaticResource Foreground}" HorizontalAlignment="Center" FontSize="30" Text="Help"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" MouseDown="StackPanelCloseMouseDown">
+                                <TextBlock Foreground="{StaticResource Foreground}"  HorizontalAlignment="Center" FontFamily="Segoe MDL2 Assets" FontSize="60" Text="&#xE8BB;"/>
+                                <TextBlock Foreground="{StaticResource Foreground}" HorizontalAlignment="Center" FontSize="30" Text="Close"/>
+                            </StackPanel>
+                        </Grid>
                     </TabItem.Content>
                 </TabItem>
-                <TabItem Header="MyFiles">
+                <TabItem Header="MyFiles" Name="MyFilesTab">
                     <DockPanel>
                         <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
                             <Button Margin="0,0,15,15" Height="30" Width="200" HorizontalAlignment="Right" Click="RemoveButtonClick">Remove</Button>
@@ -41,7 +75,7 @@
                         </ListBox>
                     </DockPanel>
                 </TabItem>
-                <TabItem Header="History">
+                <TabItem Header="History" Margin="2,-0.4,2.2,-0.4">
                     <DockPanel>
                         <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
                             <Button Margin="0,0,15,15" Height="30" Width="200" HorizontalAlignment="Right" Click="ShowToastNotification">Show Notification</Button>
@@ -58,11 +92,6 @@
                             </ListBox.ItemTemplate>
                         </ListBox>
                     </DockPanel>
-                </TabItem>
-                <TabItem Header="Settings">
-                    <TabItem.Content>
-                        <Grid></Grid>
-                    </TabItem.Content>
                 </TabItem>
                 <TabItem Header="Stats">
                     <TabItem.Content>
@@ -97,6 +126,11 @@
                                 </lvc:CartesianChart.AxisX>
                             </lvc:CartesianChart>
                         </Grid>
+                    </TabItem.Content>
+                </TabItem>
+                <TabItem Header="Settings">
+                    <TabItem.Content>
+                        <Grid></Grid>
                     </TabItem.Content>
                 </TabItem>
                 <TabItem Header="Help">

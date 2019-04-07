@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Input;
 using Windows.UI.Notifications;
 using System.Runtime.InteropServices;
+using MahApps.Metro.Controls.Dialogs;
 using static FileProtectorUI.CommonResources.Constants;
 
 namespace FileProtectorUI
@@ -47,18 +48,17 @@ namespace FileProtectorUI
             }
         }
 
-        private void RemoveButtonClick(object sender, RoutedEventArgs e)
+        private async void RemoveButtonClick(object sender, RoutedEventArgs e)
         {
-            
-            //FileDTO selectedFile = filesList.SelectedItem as FileDTO;
-            //if (selectedFile != null)
-            //{
-            //    //TODO remove file from db/list
-            //}
-            //else
-            //{
-            //    await this.ShowMessageAsync("No file was selected", "Please go back and select a file to be removed");
-            //}
+            FileDTO selectedFile = filesList.SelectedItem as FileDTO;
+            if (selectedFile != null)
+            {
+                //TODO remove file from db/list
+            }
+            else
+            {
+                await this.ShowMessageAsync("No file was selected", "Please go back and select a file to be removed");
+            }
         }
 
         private void PopulateFilesList()
@@ -76,13 +76,13 @@ namespace FileProtectorUI
             var xml = @"<toast>
                 <visual>
                     <binding template='ToastGeneric'>
-                        <text>Some title</text>
-                        <text>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</text>
+                        <text>File Protector</text>
+                        <text>Someone is trying to access your protected file: *fileName*.</text>
                     </binding>
                 </visual>
                 <actions>
-                    <action arguments = 'Start' content = 'Start' />
-                    <action arguments = 'dismiss' content = 'dismiss' />
+                    <action arguments = 'Allow' content = 'Allow' />
+                    <action arguments = 'Deny' content = 'Deny' />
                 </actions>
             </toast>";
             var toastXml = new Windows.Data.Xml.Dom.XmlDocument();
@@ -95,6 +95,41 @@ namespace FileProtectorUI
             };
             var t = ToastNotificationManager.CreateToastNotifier(APP_ID);
             t.Show(toast);
+        }
+
+        private void StackPanelMyFilesMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Dispatcher.BeginInvoke((Action)(() => mainTabControl.SelectedIndex = 1));
+        }
+
+        private void StackPanelHistoryMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Dispatcher.BeginInvoke((Action)(() => mainTabControl.SelectedIndex = 2));
+        }
+
+        private void StackPanelStatisticsMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Dispatcher.BeginInvoke((Action)(() => mainTabControl.SelectedIndex = 3));
+        }
+
+        private void StackPanelSettingsMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Dispatcher.BeginInvoke((Action)(() => mainTabControl.SelectedIndex = 4));
+        }
+
+        private void StackPanelHelpMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Dispatcher.BeginInvoke((Action)(() => mainTabControl.SelectedIndex = 5));
+        }
+
+        private void StackPanelCloseMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void StackPanel_MouseEnter(object sender, MouseEventArgs e)
+        {
+            Console.WriteLine();
         }
     }
 }
