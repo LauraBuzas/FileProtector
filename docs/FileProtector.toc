@@ -2,24 +2,42 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.1}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {1.1}Motivation}{1}{section.1.1}% 
+\contentsline {section}{\numberline {1.1}Personal Contribution}{2}{section.1.1}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {1.2}Objectives}{1}{section.1.2}% 
+\contentsline {chapter}{\numberline {2}File Protection}{3}{chapter.2}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {1.3}Personal Contribution}{1}{section.1.3}% 
+\contentsline {section}{\numberline {2.1}Built in protection}{3}{section.2.1}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {1.4}Thesis Outline}{1}{section.1.4}% 
+\contentsline {subsection}{\numberline {2.1.1}Windows}{3}{subsection.2.1.1}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {2}State of the Art}{2}{chapter.2}% 
+\contentsline {subsection}{\numberline {2.1.2}Linux}{4}{subsection.2.1.2}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {3}Used Technologies}{3}{chapter.3}% 
+\contentsline {section}{\numberline {2.2}Existing products for Windows}{4}{section.2.2}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {4}Design and Implementation}{4}{chapter.4}% 
+\contentsline {section}{\numberline {2.3}Used Technologies}{5}{section.2.3}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {5}Testing Approach}{5}{chapter.5}% 
+\contentsline {subsection}{\numberline {2.3.1}Windows Filter Manager}{5}{subsection.2.3.1}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {6}Further Work}{6}{chapter.6}% 
+\contentsline {section}{\numberline {2.4}Design and Implementation}{6}{section.2.4}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {7}Conclusion}{7}{chapter.7}% 
+\contentsline {subsection}{\numberline {2.4.1}Minifilter High Level Overview of Design}{6}{subsection.2.4.1}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{Bibliography}{8}{chapter*.1}% 
+\contentsline {subsection}{\numberline {2.4.2}IRP Filtering}{6}{subsection.2.4.2}% 
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.4.3}Monitoring and Denying Access}{6}{subsection.2.4.3}% 
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.4.4}Encountered Challenges}{6}{subsection.2.4.4}% 
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.4.5}Inter Component Communication}{6}{subsection.2.4.5}% 
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.5}Testing Approach}{7}{section.2.5}% 
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.5.1}Driver Verifier}{7}{subsection.2.5.1}% 
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.5.2}Static Code Analysis}{7}{subsection.2.5.2}% 
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {3}Further Work}{8}{chapter.3}% 
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {4}Conclusion}{9}{chapter.4}% 
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{Bibliography}{10}{chapter*.1}% 

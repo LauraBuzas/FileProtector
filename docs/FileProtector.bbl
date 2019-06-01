@@ -49,6 +49,27 @@
       \verb http://ceur-ws.org/Vol-2058/paper-08.pdf
       \endverb
     \endentry
+    \entry{MDSNDACsLACEs}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=140864078aeca1c7c35b4beb33c53c34}{%
+           family={{Microsoft}},
+           familyi={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{fullhash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{bibnamehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{authorbibnamehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{authornamehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{authorfullhash}{140864078aeca1c7c35b4beb33c53c34}
+      \field{sortinit}{M}
+      \field{sortinithash}{cfd219b90152c06204fab207bc6c7cab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{\url{https://docs.microsoft.com/en-us/windows/desktop/secauthz/dacls-and-aces}}
+      \field{title}{DACLs and ACEs}
+      \field{year}{2018}
+      \true{nocite}
+    \endentry
     \entry{KernelBasedMonitoringOnWindows}{inproceedings}{}
       \name{author}{1}{}{%
         {{hash=e77f11485944e4ce18fb74e09bae42da}{%

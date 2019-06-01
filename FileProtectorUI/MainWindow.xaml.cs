@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Windows;
+using System.Drawing;
 using System.Windows.Input;
 using Windows.UI.Notifications;
 using System.Runtime.InteropServices;
 using MahApps.Metro.Controls.Dialogs;
 using static FileProtectorUI.CommonResources.Constants;
+using System.Threading.Tasks;
+using System.Threading;
+using System.Windows.Forms;
 
 namespace FileProtectorUI
 {
@@ -20,6 +24,42 @@ namespace FileProtectorUI
         extern
         IntPtr
         function2();
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr CreateDesktop(string lpszDesktop, IntPtr lpszDevice, IntPtr pDevmode, int dwFlags, uint dwDesiredAccess, IntPtr lpsa);
+
+        [DllImport("user32.dll")]
+        private static extern bool SwitchDesktop(IntPtr hDesktop);
+
+        [DllImport("user32.dll")]
+        public static extern bool CloseDesktop(IntPtr handle);
+
+        [DllImport("user32.dll")]
+        public static extern bool SetThreadDesktop(IntPtr hDesktop);
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetThreadDesktop(int dwThreadId);
+
+        [DllImport("kernel32.dll")]
+        public static extern int GetCurrentThreadId();
+
+        enum DESKTOP_ACCESS : uint
+        {
+            DESKTOP_NONE = 0,
+            DESKTOP_READOBJECTS = 0x0001,
+            DESKTOP_CREATEWINDOW = 0x0002,
+            DESKTOP_CREATEMENU = 0x0004,
+            DESKTOP_HOOKCONTROL = 0x0008,
+            DESKTOP_JOURNALRECORD = 0x0010,
+            DESKTOP_JOURNALPLAYBACK = 0x0020,
+            DESKTOP_ENUMERATE = 0x0040,
+            DESKTOP_WRITEOBJECTS = 0x0080,
+            DESKTOP_SWITCHDESKTOP = 0x0100,
+
+            GENERIC_ALL = (DESKTOP_READOBJECTS | DESKTOP_CREATEWINDOW | DESKTOP_CREATEMENU |
+                            DESKTOP_HOOKCONTROL | DESKTOP_JOURNALRECORD | DESKTOP_JOURNALPLAYBACK |
+                            DESKTOP_ENUMERATE | DESKTOP_WRITEOBJECTS | DESKTOP_SWITCHDESKTOP),
+        }
 
         public MainWindow()
         {
@@ -81,8 +121,8 @@ namespace FileProtectorUI
                     </binding>
                 </visual>
                 <actions>
-                    <action arguments = 'Allow' content = 'Allow' />
-                    <action arguments = 'Deny' content = 'Deny' />
+                    <action arguments = 'Allow' content = 'Allow'/>
+                    <action arguments = 'Deny' content = 'Deny'/>
                 </actions>
             </toast>";
             var toastXml = new Windows.Data.Xml.Dom.XmlDocument();
@@ -95,6 +135,43 @@ namespace FileProtectorUI
             };
             var t = ToastNotificationManager.CreateToastNotifier(APP_ID);
             t.Show(toast);
+        }
+
+        private void InputPasswordMessageBoxLaunch(object sender, RoutedEventArgs e)
+        {
+            IntPtr hOldDesktop = GetThreadDesktop(GetCurrentThreadId());
+            IntPtr pNewDesktop = CreateDesktop("NewDesktop", IntPtr.Zero, IntPtr.Zero, 0, (uint)DESKTOP_ACCESS.GENERIC_ALL, IntPtr.Zero);
+
+            SwitchDesktop(pNewDesktop);
+
+            //    //pw.Close();
+            //}).Wait();
+
+            string passwd = "";
+            Thread t = new Thread(() => {
+                SetThreadDesktop(pNewDesktop);
+                //PasswordWindow pw = new PasswordWindow(pNewDesktop, hOldDesktop);
+                //pw.ShowDialog();
+
+                Form loginWnd = new Form();
+                TextBox passwordTextBox = new TextBox();
+                passwordTextBox.Location = new System.Drawing.Point(10, 30);
+                passwordTextBox.Width = 250;
+                //passwordTextBox.Font = new Font("Arial", 20, FontStyle.Regular);
+
+                loginWnd.Controls.Add(passwordTextBox);
+                loginWnd.FormClosing += (sndr, evt) => { passwd = passwordTextBox.Text; };
+                loginWnd.ShowDialog();
+            });
+            t.SetApartmentState(ApartmentState.STA);
+
+            t.Start();
+            t.Join();
+
+            SwitchDesktop(hOldDesktop);
+            SetThreadDesktop(hOldDesktop);
+            CloseDesktop(pNewDesktop);
+            Console.WriteLine("");
         }
 
         private void StackPanelMyFilesMouseDown(object sender, MouseButtonEventArgs e)
@@ -125,11 +202,6 @@ namespace FileProtectorUI
         private void StackPanelCloseMouseDown(object sender, MouseButtonEventArgs e)
         {
             this.Close();
-        }
-
-        private void StackPanel_MouseEnter(object sender, MouseEventArgs e)
-        {
-            Console.WriteLine();
         }
     }
 }

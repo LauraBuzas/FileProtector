@@ -37,12 +37,6 @@ tfPreOperation(
 		FltReleaseFileNameInformation(fileInformation);
 		return FLT_PREOP_SUCCESS_NO_CALLBACK;
 	}
-	if (!fileInformation)
-	{
-		NT_VERIFY(FALSE);
-		FltReleaseFileNameInformation(fileInformation);
-		return FLT_PREOP_SUCCESS_NO_CALLBACK;
-	}
 
 	BOOLEAN result = RtlEqualUnicodeString(&gDummyBlock, &fileInformation->FinalComponent, TRUE);
 	if (result) {
