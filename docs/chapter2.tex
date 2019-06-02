@@ -13,15 +13,33 @@
 		\label{fig:securitySettings}
 	\end{figure}
 	
-	Let us consider a new text file named "demo file.txt" on a Windows 10 OS that has 2 users, namely user" and user 1, which both have administrator permissions. To restrict access for user1 I have to go to file's properties \textbf{Security}-\textgreater\textbf{Advanced}.
+	Let us consider a new text file named "demo file.txt" on a Windows 10 OS that has 2 users, namely user and user 1, which both have administrator permissions. To restrict access for user 1 I have to go to file's properties \textbf{Security}-\textgreater\textbf{Advanced}.
 
 	In figure \ref{fig:securitySettings} we can see the "Permission Entries" which maps to DACL we mentioned earlier whilst list's entries map to ACEs. I added the Administrators and user to have full control, and also I set user 1's permissions to deny any type of action. In this example we can notice that order in which permissions are set matters because user 1 cannot access the file, even if that user takes part from Administrator's group. 
 	
 	At the moment only the current user and other possible users in the Administrator group could have access to the file. Still, we are not fully protected when it comes for example to exploits. We could consider that we are logged in with user 1, which currently does not have any kind of permission for the demo file. There is the possibility of an exploit having first user's permissions and overwriting, encrypting or deleting the file which would be disastrous.
 	
-	
 	\subsection{Linux}
-	Almost the same mechanism exists in Linux, but it's more trivial. In my examples I will talk about Ubuntu, but the mechanism is almost the same for most of the Linux distributions.
+	A similar mechanism exists in Linux, but it's more trivial. In my examples I will talk about Ubuntu, but the matter is almost the same for most of the Linux distributions.
+	
+	For every file in Linux we have permissions for three main user groups: owner of the file, owner's group and all other users. 
+	
+	\begin{figure}[h!]
+		\includegraphics[width=\linewidth]{images/linuxFilePermissions.jpg}
+		\caption{Linux file permissions}
+		\label{fig:linuxFilePermissions}
+	\end{figure}
+
+	Figure \ref{fig:linuxFilePermissions} displays in the first column 10 characters, 9 of which represent the permissions for every file and directory. The first character represents the type of item, which can be a file or a directory. The next characters are split in sets of three: the first set represents user's permission, the middle set is for group permissions, and the last set represents the permissions for other users. For the described three-character groups we can have the following possible values:
+	\begin{itemize}
+		\item "-" - restricted access
+		\item "r" - read permission
+		\item "w" - write permission
+		\item "x" - execute permission
+	\end{itemize}
+	
+	The ownership of a file can be changed through chown command whilst the permissions of the file can be changed with chmod command, so the user can decide if the file can be accessed by others. This approach is more generic than the Windows mechanism because you cannot specify the rights for every user or group of users.
+	
 		
 	\section{Existing products for Windows}
 	As a similar tool, a first one that draws attention, is iBoysoft's File Protector for Windows, coming as a 7-day free trial or a payed version. As a main functionality, this tool allows the user to select the desired folders or files to be protected, along with the protection type (i.e. read/write/delete).
@@ -99,8 +117,6 @@
 		
 		\subsection{Static Code Analysis}
 		In this section I will talk about source code annotation language (SAL). This is used to make the code more explicit, in terms of behavior, parameters, return values, or other things* to make it more understandable. In other words, programmer's work is to use annotations considering the desired functionalities, and compiler's work is to verify if the written code corresponds with the annotations. 
-		
-		Another benefit of SAL is that specifications in the form of code comments and documentation are validated by the annotations. This is an advantage because in some cases the documentation or comments can be vague, making it hard for a programmer to integrate the code correctly. Moreover, if SAL is used, the compiler can validate that the code written meets the documentation and specifications.
 		
 		All SAL annotations have a specific "look", and that is \texttt{\_Annotation\_name\_}. For example, some parameter most used SAL annotations are \texttt{\_In\_} and \texttt{\_Out\_}. \texttt{\_In\_} makes sure the compiler interprets data as being input data that cannot be modified in function's scope. \texttt{\_Out\_} allows the programmer to use the parameter as an output one, as long as the space for that parameter has been allocated by the programmer.
 		

@@ -88,6 +88,7 @@ namespace FileProtectorUI
             }
         }
 
+
         private async void RemoveButtonClick(object sender, RoutedEventArgs e)
         {
             FileDTO selectedFile = filesList.SelectedItem as FileDTO;
@@ -144,14 +145,9 @@ namespace FileProtectorUI
 
             SwitchDesktop(pNewDesktop);
 
-            //    //pw.Close();
-            //}).Wait();
-
             string passwd = "";
             Thread t = new Thread(() => {
                 SetThreadDesktop(pNewDesktop);
-                //PasswordWindow pw = new PasswordWindow(pNewDesktop, hOldDesktop);
-                //pw.ShowDialog();
 
                 Form loginWnd = new Form();
                 TextBox passwordTextBox = new TextBox();

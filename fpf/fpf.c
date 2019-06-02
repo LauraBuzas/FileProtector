@@ -20,7 +20,6 @@ tfPreOperation(
 	PAGED_CODE();
 
 	__debugbreak();
-
 	NTSTATUS status = FltGetFileNameInformation(Data, FLT_FILE_NAME_OPENED | FLT_FILE_NAME_QUERY_ALWAYS_ALLOW_CACHE_LOOKUP, &fileInformation);
 	if (!NT_SUCCESS(status)) {
 		return FLT_PREOP_SUCCESS_NO_CALLBACK;
