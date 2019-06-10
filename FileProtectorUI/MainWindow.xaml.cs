@@ -1,29 +1,52 @@
 ﻿using System;
 using System.Windows;
-using System.Drawing;
+using System.Threading;
 using System.Windows.Input;
+using System.Windows.Forms;
 using Windows.UI.Notifications;
 using System.Runtime.InteropServices;
 using MahApps.Metro.Controls.Dialogs;
 using static FileProtectorUI.CommonResources.Constants;
-using System.Threading.Tasks;
-using System.Threading;
-using System.Windows.Forms;
 
 namespace FileProtectorUI
 {
     public partial class MainWindow
     {
-
-        [DllImport("FileProtectorCore.dll")]
-        static extern int function();
-
         [DllImport("FileProtectorCore.dll", CharSet = CharSet.Auto)]
         public
         static
         extern
         IntPtr
         function2();
+
+        [DllImport("FileProtectorCore.dll", CharSet = CharSet.Unicode)]
+        public
+        static
+        extern
+        IntPtr
+        ProtectFile(
+            String Path,
+            ushort Length
+        );
+
+        [DllImport("FileProtectorCore.dll", CharSet = CharSet.Unicode)]
+        public
+        static
+        extern
+        void
+        GetNextNotification(
+            out IntPtr Path,
+            out ulong Pid
+        );
+
+        [DllImport("FileProtectorCore.dll", CharSet = CharSet.Unicode)]
+        public
+        static
+        extern
+        void
+        FreeNotification(
+             IntPtr Path
+        );
 
         [DllImport("user32.dll")]
         public static extern IntPtr CreateDesktop(string lpszDesktop, IntPtr lpszDevice, IntPtr pDevmode, int dwFlags, uint dwDesiredAccess, IntPtr lpsa);
@@ -65,11 +88,20 @@ namespace FileProtectorUI
         {
             var a = Marshal.PtrToStringAnsi(function2());
             InitializeComponent();
-            protectedFiles = new ProtectedFiles();
             PopulateFilesList();
+            string path = null;
+            ulong pid = 0;
+            IntPtr ptr;
+            GetNextNotification(out ptr, out pid);
+            path = System.Runtime.InteropServices.Marshal.PtrToStringUni(ptr);
+            FreeNotification(ptr);
+            Console.WriteLine(path);
         }
 
-        private ProtectedFiles protectedFiles;
+        private void ReadProtectedPaths()
+        {
+            //Registry.GetValue
+        }
 
         private void BrowseButtonClick(object sender, RoutedEventArgs e)
         {
@@ -77,6 +109,12 @@ namespace FileProtectorUI
 
             // Set initial directory    
             //openFileDlg.InitialDirectory = @"C:\Users\";
+
+            // create _syncContext on application startup
+            //var _syncContext = SynchronizationContext.Current;
+
+            // whenever you do UI shit, schedule on syncContext
+            //_syncContext.Send(o => { return; }, null);
 
             openFileDlg.Multiselect = true;
             openFileDlg.Filter = "All files (*.*)|*.*";
@@ -86,6 +124,9 @@ namespace FileProtectorUI
             {
                 //add it in the table
             }
+            ProtectedFiles.AddFile(openFileDlg.FileName);
+            var path = "\\??\\" + openFileDlg.FileName;
+            ProtectFile(path, (ushort)path.Length);
         }
 
 
@@ -94,7 +135,7 @@ namespace FileProtectorUI
             FileDTO selectedFile = filesList.SelectedItem as FileDTO;
             if (selectedFile != null)
             {
-                //TODO remove file from db/list
+                ProtectedFiles.RemoveFile(selectedFile);
             }
             else
             {
@@ -104,7 +145,8 @@ namespace FileProtectorUI
 
         private void PopulateFilesList()
         {
-            filesList.ItemsSource = protectedFiles.GetProtectedFiles();
+            ProtectedFiles.GetProtectedFilesFromRegistryKey();
+            filesList.ItemsSource = ProtectedFiles.files;
         }
 
         private void StackPanel_MouseUp(object sender, MouseButtonEventArgs e)
@@ -131,6 +173,19 @@ namespace FileProtectorUI
             var toast = new ToastNotification(toastXml);
             toast.Activated += (notification, esf) =>
             {
+                var arg = esf as ToastActivatedEventArgs;
+                var args = arg.Arguments;
+
+                switch(args)
+                {
+                    case "Deny":
+                        break;
+                    case "Allow":
+                        var passw = InputPasswordMessageBoxLaunch();
+                        break;
+                    default:
+                        break;
+                }
                 //TODO based on args, solve the buttons
                 Console.WriteLine("a");
             };
@@ -138,7 +193,7 @@ namespace FileProtectorUI
             t.Show(toast);
         }
 
-        private void InputPasswordMessageBoxLaunch(object sender, RoutedEventArgs e)
+        private string InputPasswordMessageBoxLaunch()
         {
             IntPtr hOldDesktop = GetThreadDesktop(GetCurrentThreadId());
             IntPtr pNewDesktop = CreateDesktop("NewDesktop", IntPtr.Zero, IntPtr.Zero, 0, (uint)DESKTOP_ACCESS.GENERIC_ALL, IntPtr.Zero);
@@ -167,7 +222,7 @@ namespace FileProtectorUI
             SwitchDesktop(hOldDesktop);
             SetThreadDesktop(hOldDesktop);
             CloseDesktop(pNewDesktop);
-            Console.WriteLine("");
+            return passwd;
         }
 
         private void StackPanelMyFilesMouseDown(object sender, MouseButtonEventArgs e)

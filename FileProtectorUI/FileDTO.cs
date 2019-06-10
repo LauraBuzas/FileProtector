@@ -12,13 +12,22 @@ namespace FileProtectorUI
 
         public string Path { get; set; }
 
-        public DateTime DateAdded { get; set; }
-
-        public FileDTO(string Name, string Path, DateTime DateAdded)
+        public FileDTO(string Name, string Path)
         {
             this.Name = Name;
             this.Path = Path;
-            this.DateAdded = DateAdded;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if ((obj == null) || !this.GetType().Equals(obj.GetType()))
+            {
+                return false;
+            }
+            else
+            {
+                return (Path == ((FileDTO)obj).Path) && (Name == ((FileDTO)obj).Name);
+            }
         }
     }
 }
