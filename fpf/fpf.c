@@ -9,6 +9,20 @@ UNICODE_STRING gPortName = RTL_CONSTANT_STRING(L"\\FpPort");
 
 PFLT_PORT gClientPort;
 
+typedef struct _PROTECTED_PATH_ENTRY
+{
+	PVOID Path;
+	LIST_ENTRY ListEntry;
+}PROTECTED_PATH_ENTRY, *PPROTECTED_PATH_ENTRY;
+
+LIST_ENTRY gProtectedPaths;
+/*
+(PPROTECTED_PATH_ENTRY)gProtectedPaths->Flink;
+
+auto entry = CONTAINING_RECORD(flink, PROTECTED_PATH_ENTRY, ListEntry)
+
+*/
+
 #pragma warning(push)
 #pragma warning(disable: 4200)
 
@@ -98,6 +112,7 @@ FpPreOperation(
 		if (shouldBlock) {
 			Data->IoStatus.Status = STATUS_ACCESS_DENIED;
 			Data->IoStatus.Information = 0;
+			return FLT_PREOP_COMPLETE;
 		}
 		return FLT_PREOP_SUCCESS_NO_CALLBACK;
 	}

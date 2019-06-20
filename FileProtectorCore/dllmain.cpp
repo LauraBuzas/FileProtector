@@ -153,6 +153,8 @@ extern "C"
 		path[2] = L'\0';
 		*Path = path;
 
+		//FilterGetMessage(gFilterPort, )
+
 		return S_OK;
 	}
 

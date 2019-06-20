@@ -1,7 +1,29 @@
 \chapter{Further Work}
 
-//TODO
+Like most of the application, this one can also have functional improvements as well as user experience improvements. 
 
-* make file blocking more efficient
+\section{File name matching efficiency}
 
-* make this project at a bigger scale
+\paragraph{}
+At the moment, file name matching is done in a trivial way. Let us consider that a user tries to open a file which is already protected. In the minifilter driver, the file name is searched in the list, which leads to an $O(m*n)$ complexity, n being the length of the searched file name and m representing list's length.
+\paragraph{}
+A solution to improve the file search would be implementing the Aho-Corasick Algorithm. At a first glance it can be said the complexity would be reduced to $O(n + m)$, with n and m having the same meaning as mentioned above. What would need to change in the current code is that list should be removed, and replaced with a trie. At system startup the driver should load the protected files into a trie containing all word possibilities. Next step is to extend the trie into an automaton which can mach any word from the given list of file names. Now if we review the complexity and we consider the fact that the trie is made just once, when the system starts, the complexity would be $\theta(n + m)$. There is only one situation when the trie needs to be modified, and that is when a user adds a new file for protection. Usually users would add most of the files when they first install the application, after that the number of files being almost negligible. To summarize the last paragraph Aho-Corasick is a great improvement in terms of complexity when it comes to string matching.
+
+\paragraph{}
+Another good approach when it comes to performance, would be replacing the list with a crit bit tree.
+
+
+\section{Enterprise environment integration}
+\paragraph{}
+Thinking of a master with multiple slaves architecture, the application can have a master console where the sysadmins can add protected files which will be protected by default in all machines in the network. 
+
+\paragraph{}
+Regarding the master console, the sysadmins would have an exact statistic on the network activity regarding file protection. This means the current history would be changed to display information divided by machines and a statistic as a whole. As for the other features, the protection could be turned on or off only from the main console in all the network.
+
+\paragraph{}
+Users would have almost the same view of the application. The only difference is that there would be a new tab listing protected paths added by the organization's system administrators or security experts. Also, the users would still be able to add personal files if they desire, but they cannot touch the ones protected by default. The other thing that would be different is that they won't be able to turn the protection on or off.
+
+\paragraph{}
+This would be a great approach because control is important in such an environment, especially when it comes to data protection. Malware trying to exfiltrate corporate date would be easily spotted in case it got into the network. Moreover, the statistics regarding file access on infected machines would be useful for damage assessment.
+
+

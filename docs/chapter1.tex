@@ -1,25 +1,36 @@
 \chapter{Introduction}
+	\paragraph{}
 	Privacy is one of the things humanity has been keen on in the last few decades. To achieve safety software-wise, as a first thing, you would like to protect personal data. 
 	
+	\paragraph{}
 	What is important to keep in mind regarding data security is a matter of three concepts, namely availability, confidentiality and integrity, each one them having a high importance. Data availability means that it is available at any time, in case the user tries to access it.
 	
+	\paragraph{}
 	Confidentiality is all about data that cannot be accessed without adequate authorization. A solution to take into account when it comes to confidentiality would be encryption. This is a proper solution, regarding the fact that a user's data will be available to read only for him.
 	
+	\paragraph{}
 	Integrity means that user's data cannot be modified without authorization. In case integrity is violated, the data would be in an inconsistent state, not what the user is expecting. This would also render the data unavailable because the user does not have access to the old data anymore.
 	
+	\paragraph{}
 	To achieve data safety you can consider having your data encrypted, but even with it, the integrity problem would still be open.   
 	
+	\paragraph{}
 	The main objective of this paper is to describe the process of design and implementation of a solution that tackles the integrity problem mentioned above. The designed solution is composed of: a minifilter driver that contains the monitoring and protection logic, a DLL that is an abstract interface over the minifilter functionality, and a Windows Desktop application built on top of WPF (Windows Presentation Foundation). 
 	
+	\paragraph{}
 	The second chapter of this paper contains four sections. First section is an high level overview of a few existing products, containing their description and functionality. Second section is divided in three main subjects: Windows Filter Manager where I'll be discussing the minifilter framework and how it can be used to achieve our proposed objective, C and .NET where I will motivate why I've chosen to use these languages. Third section is a detailed view of solution's design and implementation, especially the minifilter logic and communication. Last section focuses on how the application was tested.
 	
+	\paragraph{}
 	Third chapter describes the further work that can be done to add more functionality to the current application. 
 	
+	\paragraph{}
 	Last chapter is a conclusion of the paper, summing up the main ideas.
 		
 	\section{Personal Contribution}
+	\paragraph{}
 	Designing an SDK (Software Development Kit) that can be integrated by third-parties. My work consists of providing a documented interface for integrators in order to easily manage file protection rules that are based on Windows Kernel-level mechanisms.
 	
-	The purpose of this is to provide an abstraction. //TODO
+	\paragraph{}
+	The purpose of this is to provide an abstraction.
 	
 	

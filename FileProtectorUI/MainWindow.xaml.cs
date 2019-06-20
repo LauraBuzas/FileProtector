@@ -12,6 +12,9 @@ namespace FileProtectorUI
 {
     public partial class MainWindow
     {
+        public readonly SynchronizationContext syncCtx;
+        private Thread worker;
+
         [DllImport("FileProtectorCore.dll", CharSet = CharSet.Auto)]
         public
         static
@@ -89,13 +92,24 @@ namespace FileProtectorUI
             var a = Marshal.PtrToStringAnsi(function2());
             InitializeComponent();
             PopulateFilesList();
-            string path = null;
-            ulong pid = 0;
-            IntPtr ptr;
-            GetNextNotification(out ptr, out pid);
-            path = System.Runtime.InteropServices.Marshal.PtrToStringUni(ptr);
-            FreeNotification(ptr);
-            Console.WriteLine(path);
+            syncCtx = SynchronizationContext.Current;
+            worker = new Thread(NotificationWorker);
+            worker.Start();
+        }
+
+        private void NotificationWorker()
+        {
+            while (true)
+            {
+                string path = null;
+                ulong pid = 0;
+                IntPtr ptr;
+                GetNextNotification(out ptr, out pid);
+                path = System.Runtime.InteropServices.Marshal.PtrToStringUni(ptr);
+                bool allow = false;
+                syncCtx.Send(o => allow = ShowToastNotification(), null);
+                FreeNotification(ptr);
+            }
         }
 
         private void ReadProtectedPaths()
@@ -154,43 +168,59 @@ namespace FileProtectorUI
             var panel = sender as System.Windows.Controls.StackPanel;
         }
 
-        private void ShowToastNotification(object sender, RoutedEventArgs e)
+        private bool ShowToastNotification()
         {
             var xml = @"<toast>
                 <visual>
                     <binding template='ToastGeneric'>
                         <text>File Protector</text>
-                        <text>Someone is trying to access your protected file: *fileName*.</text>
+                        <text>Someone is trying to access your protected file: text.txt.</text>
                     </binding>
                 </visual>
                 <actions>
-                    <action arguments = 'Allow' content = 'Allow'/>
+                    <action arguments = 'More' content = 'More'/>
                     <action arguments = 'Deny' content = 'Deny'/>
                 </actions>
             </toast>";
             var toastXml = new Windows.Data.Xml.Dom.XmlDocument();
             toastXml.LoadXml(xml);
             var toast = new ToastNotification(toastXml);
+            String passw = null;
+            ManualResetEvent evt = new ManualResetEvent(false);
             toast.Activated += (notification, esf) =>
             {
                 var arg = esf as ToastActivatedEventArgs;
                 var args = arg.Arguments;
 
-                switch(args)
+                switch (args)
                 {
                     case "Deny":
                         break;
-                    case "Allow":
-                        var passw = InputPasswordMessageBoxLaunch();
+                    case "More":
+                        passw = InputPasswordMessageBoxLaunch();
                         break;
                     default:
                         break;
                 }
-                //TODO based on args, solve the buttons
-                Console.WriteLine("a");
+
+                evt.Set();
             };
+            toast.Failed += Toast_Failed;
+            toast.Dismissed += Toast_Dismissed;
             var t = ToastNotificationManager.CreateToastNotifier(APP_ID);
             t.Show(toast);
+            evt.WaitOne();
+            return passw == "123";
+        }
+
+        private void Toast_Dismissed(ToastNotification sender, ToastDismissedEventArgs args)
+        {
+            return;
+        }
+
+        private void Toast_Failed(ToastNotification sender, ToastFailedEventArgs args)
+        {
+            return;
         }
 
         private string InputPasswordMessageBoxLaunch()
@@ -201,7 +231,7 @@ namespace FileProtectorUI
             SwitchDesktop(pNewDesktop);
 
             string passwd = "";
-            Thread t = new Thread(() => {
+            Thread t = new Thread(() => { //why?
                 SetThreadDesktop(pNewDesktop);
 
                 Form loginWnd = new Form();
@@ -210,7 +240,7 @@ namespace FileProtectorUI
                 passwordTextBox.Width = 250;
                 //passwordTextBox.Font = new Font("Arial", 20, FontStyle.Regular);
 
-                loginWnd.Controls.Add(passwordTextBox);
+                loginWnd.Controls.Add(passwordTextBox);`
                 loginWnd.FormClosing += (sndr, evt) => { passwd = passwordTextBox.Text; };
                 loginWnd.ShowDialog();
             });

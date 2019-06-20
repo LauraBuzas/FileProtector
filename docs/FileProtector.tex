@@ -1,169 +1,169 @@
 \documentclass[12pt]{extreport}
 
-    \usepackage{titlesec}
-    \usepackage{listings}
-    \usepackage[dvipsnames]{xcolor}
-    \usepackage{fancyvrb}
-    \usepackage[utf8]{inputenc}
-    \usepackage{titlesec}
-    \usepackage[sorting=nty]{biblatex}
-    \usepackage{tocloft}
-    \usepackage{hyperref}
-    \usepackage{enumerate}
-    \usepackage{graphicx}
-    \usepackage{float}
-    \usepackage[a4paper,left=3cm,top=2cm,right=3cm,bottom=3cm]{geometry}
-    \usepackage{indentfirst}
-    \usepackage{placeins}
-    \usepackage{etoolbox}
+\usepackage{titlesec}
+\usepackage{listings}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{fancyvrb}
+\usepackage[utf8]{inputenc}
+\usepackage{titlesec}
+\usepackage[sorting=nty]{biblatex}
+\usepackage{tocloft}
+\usepackage{hyperref}
+\usepackage{enumerate}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage[a4paper,left=3cm,top=2cm,right=3cm,bottom=3cm]{geometry}
+\usepackage{indentfirst}
+\usepackage{placeins}
+\usepackage{etoolbox}
 
-    
-    \renewcommand{\cftpartleader}{\cftdotfill{\cftdotsep}}
-    \renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}}
-    
-    \titleformat{\chapter}{}{}{0em}{\bfseries\LARGE\ifnum\value{chapter}>0\relax\arabic{chapter}.~\fi}
 
-    \lstset{ % General setup for the package
-        belowcaptionskip=1\baselineskip,
-        breaklines=true,
-        frame=L,
-        xleftmargin=\parindent,
-        language=C++,
-        showstringspaces=false,
-        basicstyle=\footnotesize\ttfamily,
-        morekeywords={PsSetCreateProcessNotifyRoutineEx2},
-        keywordstyle=\color{blue},
-        commentstyle=\itshape\color{purple!40!black},
-        identifierstyle=\color{gray},
-        stringstyle=\color{orange}
-    }
+\renewcommand{\cftpartleader}{\cftdotfill{\cftdotsep}}
+\renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}}
 
-    \hypersetup{
-        colorlinks,
-        citecolor=black,
-        filecolor=black,
-        linkcolor=black,
-        urlcolor=black
-    }
+\titleformat{\chapter}{}{}{0em}{\bfseries\LARGE\ifnum\value{chapter}>0\relax\arabic{chapter}.~\fi}
 
-    \title{Title}
-    \author{
-        Buzas Laura Andrada
-        \\ email \href{mailto:b.laura.andrada96@gmail.com}{b.laura.andrada96@gmail.com}
-        \\ [1cm]{\normalsize Advisor: Czibula Istvan Gergely }
-    }
-    
-    \date{}
+\lstset{ % General setup for the package
+	belowcaptionskip=1\baselineskip,
+	breaklines=true,
+	frame=L,
+	xleftmargin=\parindent,
+	language=C++,
+	showstringspaces=false,
+	basicstyle=\footnotesize\ttfamily,
+	morekeywords={PsSetCreateProcessNotifyRoutineEx2},
+	keywordstyle=\color{blue},
+	commentstyle=\itshape\color{purple!40!black},
+	identifierstyle=\color{gray},
+	stringstyle=\color{orange}
+}
 
-    \addbibresource{bibliography.bib}
+\hypersetup{
+	colorlinks,
+	citecolor=black,
+	filecolor=black,
+	linkcolor=black,
+	urlcolor=black
+}
 
-    
-    \begin{document}
+\title{Title}
+\author{
+	Buzas Laura Andrada
+	\\ email \href{mailto:b.laura.andrada96@gmail.com}{b.laura.andrada96@gmail.com}
+	\\ [1cm]{\normalsize Advisor: Czibula Istvan Gergely }
+}
 
-    \newgeometry{margin=0.9in}
+\date{}
 
-    \pagestyle{empty}
-    \begin{titlepage}
+\addbibresource{bibliography.bib}
 
-        \begin{center}
-        {\Large UNIVERSITATEA BABEŞ-BOLYAI CLUJ-NAPOCA}
-        \end{center}
-    
-        \begin{center}
-        {\Large FACULTATEA DE MATEMATICǍ ŞI INFORMATICǍ}
-        \end{center}
-    
-        \begin{center}
-        {\Large SPECIALIZAREA ÎN INFORMATICǍ}
-        \end{center}
-    
-        \vfill
-    
-        \begin{center}
-        {\LARGE LUCRARE DE LICENŢĂ}
-        \end{center}
-    
-        \begin{center}
-        {\Huge *Titlu*}
-        \end{center}
-    
-        \vfill
-    
-        \begin{flushleft}
-        {\LARGE Conducător ştiinţific  \\ Dr. CZIBULA Istvan Gergely, Profesor Universitar}
-        \end{flushleft}
-    
-        \begin{flushright}
-        {\Large Absolvent \\ BUZAS Laura Andrada}
-        \end{flushright}
-    
-        \vfill
-    
-        \begin{center}
-        {\LARGE 2019}
-        \end{center}
 
-        \pagebreak
-
-        \begin{center}
-        {\Large BABEŞ-BOLYAI UNIVERSITY CLUJ-NAPOCA}
-        \end{center}
-
-        \begin{center}
-        {\Large FACULTY OF MATHEMATICS AND COMPUTER SCIENCE}
-        \end{center}
-
-        \begin{center}
-        {\Large SPECIALIZATION IN COMPUTER SCIENCE}
-        \end{center}
-
-        \vfill
-
-        \begin{center}
-        {\LARGE DIPLOMA THESIS}
-        \end{center}
-
-        \begin{center}
-        {\Huge *Title*}
-        \end{center}
-
-        \vfill
-
-        \begin{flushleft}
-        {\LARGE Supervisor \\ PhD. CZIBULA Istvan Gergely, Professor}
-        \end{flushleft}
-
-        \begin{flushright}
-        {\Large Author \\ BUZAS Laura Andrada}
-        \end{flushright}
-
-        \vfill
-
-        \begin{center}
-        {\LARGE 2019}
-    \end{center}
-
-    \end{titlepage}
-    \restoregeometry
-    \pagestyle{plain}
-
-    \pagenumbering{Roman}
-    
-
-    \tableofcontents
-    \pagebreak
-
-    
-    \pagenumbering{arabic}
-
-    \include{chapter1}
-    \include{chapter2}
-    \include{chapter3}
-    \include{chapter4}
-    
-    \titleformat{\chapter}{}{}{0em}{\bfseries\LARGE}
-    \nocite{*}
-    \emergencystretch=1em
-    \printbibliography[heading=bibintoc, title={}]
-
+\begin{document}
+	
+	\newgeometry{margin=0.9in}
+	
+	\pagestyle{empty}
+	\begin{titlepage}
+		
+		\begin{center}
+			{\Large UNIVERSITATEA BABEŞ-BOLYAI CLUJ-NAPOCA}
+		\end{center}
+		
+		\begin{center}
+			{\Large FACULTATEA DE MATEMATICǍ ŞI INFORMATICǍ}
+		\end{center}
+		
+		\begin{center}
+			{\Large SPECIALIZAREA ÎN INFORMATICǍ}
+		\end{center}
+		
+		\vfill
+		
+		\begin{center}
+			{\LARGE LUCRARE DE LICENŢĂ}
+		\end{center}
+		
+		\begin{center}
+			{\Huge Utilizarea Managerului de Filtrare Windows Pentru a Proteja Confidențialitatea Datelor Utilizatorilor}
+		\end{center}
+		
+		\vfill
+		
+		\begin{flushleft}
+			{\LARGE Conducător ştiinţific  \\ Dr. CZIBULA Istvan Gergely, Profesor Universitar}
+		\end{flushleft}
+		
+		\begin{flushright}
+			{\Large Absolvent \\ BUZAS Laura Andrada}
+		\end{flushright}
+		
+		\vfill
+		
+		\begin{center}
+			{\LARGE 2019}
+		\end{center}
+		
+		\pagebreak
+		
+		\begin{center}
+			{\Large BABEŞ-BOLYAI UNIVERSITY CLUJ-NAPOCA}
+		\end{center}
+		
+		\begin{center}
+			{\Large FACULTY OF MATHEMATICS AND COMPUTER SCIENCE}
+		\end{center}
+		
+		\begin{center}
+			{\Large SPECIALIZATION IN COMPUTER SCIENCE}
+		\end{center}
+		
+		\vfill
+		
+		\begin{center}
+			{\LARGE DIPLOMA THESIS}
+		\end{center}
+		
+		\begin{center}
+			{\Huge Leveraging the Windows Filter Manager to Protect User Data Confidentiality}
+		\end{center}
+		
+		\vfill
+		
+		\begin{flushleft}
+			{\LARGE Supervisor \\ PhD. CZIBULA Istvan Gergely, Professor}
+		\end{flushleft}
+		
+		\begin{flushright}
+			{\Large Author \\ BUZAS Laura Andrada}
+		\end{flushright}
+		
+		\vfill
+		
+		\begin{center}
+			{\LARGE 2019}
+		\end{center}
+		
+	\end{titlepage}
+	\restoregeometry
+	\pagestyle{plain}
+	
+	\pagenumbering{Roman}
+	
+	
+	\tableofcontents
+	\pagebreak
+	
+	
+	\pagenumbering{arabic}
+	
+	\include{chapter1}
+	\include{chapter2}
+	\include{chapter3}
+	\include{chapter4}
+	
+	\titleformat{\chapter}{}{}{0em}{\bfseries\LARGE}
+	\nocite{*}
+	\emergencystretch=1em
+	\printbibliography[heading=bibintoc, title={}]
+	
 \end{document}

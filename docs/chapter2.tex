@@ -1,10 +1,13 @@
 \chapter{File Protection}
 	\section{Built in protection}
-	It's important to know that usually, operating systems do not have a built in mechanism that include a password protection method. However, there is a file permission policy that counts as a level of protection from other users.
+	\paragraph{}
+	Usually, operating systems do not have a built in mechanism that include a password protection method. However, there is a file permission policy that counts as a level of protection from other users.
 	
 	\subsection{Windows}
+	\paragraph{}
 	File protection in Windows can be achieved through DACLs (discretionary access control lists). As a short explanation, a Windows object can have a DACL which contains ACEs(access control entries) that define what type of access any user or group of users can have. \cite{MDSNDACsLACEs}
-		
+	
+	\paragraph{}
 	Usually, DACLs are used by defining the users and groups that can have access because the ones that are not included will have restricted access by default. If a DACL does not contain any ACEs the system will deny any type of access.
 	
 	\begin{figure}[h!]
@@ -13,15 +16,20 @@
 		\label{fig:securitySettings}
 	\end{figure}
 	
+	\paragraph{}
 	Let us consider a new text file named "demo file.txt" on a Windows 10 OS that has 2 users, namely user and user 1, which both have administrator permissions. To restrict access for user 1 I have to go to file's properties \textbf{Security}-\textgreater\textbf{Advanced}.
-
+	
+	\paragraph{}
 	In figure \ref{fig:securitySettings} we can see the "Permission Entries" which maps to DACL we mentioned earlier whilst list's entries map to ACEs. I added the Administrators and user to have full control, and also I set user 1's permissions to deny any type of action. In this example we can notice that order in which permissions are set matters because user 1 cannot access the file, even if that user takes part from Administrator's group. 
 	
+	\paragraph{}
 	At the moment only the current user and other possible users in the Administrator group could have access to the file. Still, we are not fully protected when it comes for example to exploits. We could consider that we are logged in with user 1, which currently does not have any kind of permission for the demo file. There is the possibility of an exploit having first user's permissions and overwriting, encrypting or deleting the file which would be disastrous.
 	
 	\subsection{Linux}
+	\paragraph{}
 	A similar mechanism exists in Linux, but it's more trivial. In my examples I will talk about Ubuntu, but the matter is almost the same for most of the Linux distributions.
 	
+	\paragraph{}
 	For every file in Linux we have permissions for three main user groups: owner of the file, owner's group and all other users. 
 	
 	\begin{figure}[h!]
@@ -29,7 +37,8 @@
 		\caption{Linux file permissions}
 		\label{fig:linuxFilePermissions}
 	\end{figure}
-
+	
+	\paragraph{}
 	Figure \ref{fig:linuxFilePermissions} displays in the first column 10 characters, 9 of which represent the permissions for every file and directory. The first character represents the type of item, which can be a file or a directory. The next characters are split in sets of three: the first set represents user's permission, the middle set is for group permissions, and the last set represents the permissions for other users. For the described three-character groups we can have the following possible values:
 	\begin{itemize}
 		\item "-" - restricted access
@@ -38,12 +47,15 @@
 		\item "x" - execute permission
 	\end{itemize}
 	
+	\paragraph{}
 	The ownership of a file can be changed through chown command whilst the permissions of the file can be changed with chmod command, so the user can decide if the file can be accessed by others. This approach is more generic than the Windows mechanism because you cannot specify the rights for every user or group of users.
 	
 		
 	\section{Existing products for Windows}
+	\paragraph{}
 	As a similar tool, a first one that draws attention, is iBoysoft's File Protector for Windows, coming as a 7-day free trial or a payed version. As a main functionality, this tool allows the user to select the desired folders or files to be protected, along with the protection type (i.e. read/write/delete).
 	
+	\paragraph{}
 	The application starts with a message box, demanding a password. After it was inserted correctly, the application starts, displaying on the main screen a list of files and folders the user has chosen to be protected.
 	
 	\begin{figure}[h!]
@@ -52,78 +64,345 @@
 		\label{fig:iBoysoftFP}
 	\end{figure}
 	
+	\paragraph{}
 	In figure \ref{fig:iBoysoftFP} we can see the main screen of the application, where we have a list of protected files, buttons for adding files or folders, and also the menu on the right. 
 	
+	\paragraph{}
 	Another feature of this tool is the allowed applications. There, the user can choose which applications that can have rights, in spite of the protection selected for the file or folder. After adding an application, the user should also add the files or folders that application can have access to.
 	
+	\paragraph{}
 	If for example a text file was added to the list with read protection, that file cannot be opened by the user, which is a drawback for this application. There is one thing that can be done, and that is giving permissions to other applications to perform actions upon the desired files.
 	
+	\paragraph{}
 	There is also the settings tab which contains two important sections, one where you can change the password, another one where you can choose the default protection types that are selected when adding a file or folder.
 	
+	\paragraph{}
 	As a conclusion, the only time a password is required, is when the application is started. 
 	
-	*find another soft like this
+	\newpage
+	\section{Linux Proof of Concept}
+	
 	
 	\newpage
-	\section{Used Technologies}
-		There are three main technologies that I want to talk about in the next subsections, namely Windows Filter Manager, which is important as a concept to be understood, C and .NET where I will explain my choice. //TODO
+	\section{Windows Kernel Development}
+		This chapter has as purpose to present an overview to main concepts related to Windows drivers and minifilter drivers as well as main functionalities.
+	
+		\subsection{Windows Drivers}
+		\paragraph{}
+		A Windows Driver is a software component which usually makes the communication between the operating system and devices possible. What is important, and is not commonly known is that not all the drivers need to communicate directly with a device. For example, an I/O request can be passed through multiple drivers overlaid in a stack, like in figure \ref{fig:drivers}. These drivers can complete, modify or pass along the request to the drivers below until the request is completed by one of the drivers. After a request is fulfilled a completion notification could be sent to interested drivers.  \cite{MSDNWhatIsADriver}
+		
+		
+		\begin{figure}[h!]
+			\begin{center}
+				\includegraphics{images/Drivers.jpg}
+				\caption{Request path through drivers\cite{MSDNWhatIsADriver}}
+				\label{fig:drivers}
+			\end{center}
+		\end{figure}
+		\paragraph{}
+		I/O requests are sent to device drivers packaged in IRPs (I/O request packets). An IRP is a structure containing request's information. An important role pays the following field from the IRP structure: \cite{MSDNIORequests}
+		\bigskip
+		
+			\centerline{\textcolor{blue}{struct} \textcolor{cyan}{\texttt{\_IO\_STACK\_LOCATION}} *\textcolor{cyan}{CurrentStackLocation}}
+		
+		\bigskip
+		\paragraph{}
+		I/O manager takes care for each driver to have an I/O stack location for every IRP. As an overview, the I/O manager creates for every IRP an array with I/O stack locations, every element corresponding to driver.
+		
+		\paragraph{}
+		The I/O stack location of an IRP is comprised of the following information: \cite{MSDNIOStackLocations}
+		\begin{itemize}
+			\item IRP\_MJ\_*  - a major function code that the driver should handle
+			\item IRP\_MN\_*  - a minor function code which indicates a particular case of a major operation. This can be found for example in PnP (Plug and Play) drivers. 
+			\item A set of arguments related to the operation that should be performed, like the offset from where the driver starts reading and length that should be read.
+			\item A pointer to the device object representing the target device for requested operation.
+			\item A pointer to the file object which can be for example an open file or directory
+		\end{itemize}
+		
+		\paragraph{}
+		As some basic examples of major IRPs which are also common, the following can be considered:		
+		\begin{itemize}
+			\item \texttt{IRP\_MJ\_CREATE} - describes a request to open a handle to a resource
+			\item \texttt{IRP\_MJ\_WRITE} - contains a buffer with data to be transferred to a device.
+			\item \texttt{IRP\_MJ\_READ} - describes a buffer which the driver can fill in with data from a device.
+			\item \texttt{IRP\_MJ\_CLEANUP} - this IRP is issued when all handles to a file object are closed.
+		\end{itemize}
+	
+		\paragraph{}
+	   	In order to get information regarding the I/O performed operation in a  driver \textcolor{blue}{IoGetCurrentIrpStackLocation} has to be called . After the desired operations have been performed in the current high-level driver, the developer   must set up the I/O stack location for the next driver. \cite{MSDNIOStackLocations} 
+	   
+	   	\paragraph{}
+	   	In terms of ways to organize a driver, there are multiple driver models such as Legacy Model, WDM (Windows Driver Model) or WDF (Windows Driver Foundation). The models consist of a set of API's that ease the development process. Depending on what type of driver a developer wants to implement a model can be chosen. In general, drivers can be of the following types: bus drivers, function drivers and filter drivers. 
+	   	
+	   	\paragraph{}
+	   	A bus driver is responsible with individual I/O bus devices. Bus drivers are required and there usually exist bus drivers for every type of bus on the machine. This type of driver can also report child devices connected to the bus. Microsoft and OEMs usually offers a set of common bus drivers such as USB, PCI and many others. \cite{MSDNWDMDrivers}
+	   	
+	   	\paragraph{}
+	   	Function drivers are the main driver for a device providing its operational interface. They usually handle writes, reads and manages device's power policy. This type of drivers can service more than one device. \cite{MSDNWDMDrivers}
+	   
+	   	\paragraph{}
+	   	Finally, filter drivers are optional drivers which filter I/O requests thus making a change in device's usual behavior. Like functional drivers, a filter driver can service more than one device. Filter drivers can be of types: bus filter drivers, lower-level filter drivers and upper-level filter drivers. \cite{MSDNWDMDrivers}
+	   
+	   	\paragraph{}
+	   	For a better understanding of filter drivers an example would be a driver that encrypts the disk data. It's functionality is to encrypt everything that goes to the disk and also decrypt the content requested from upper drivers. Therefore, the said filter driver could be an upper filter for the disk driver.
+	   
+	   	\paragraph{}
+	   	From this example we can easily see that the way drivers are structured is in compliance with the first two SOLID principles. The single responsibility principle is backed up by the fact that every driver should handle one particular functionality that is easy to maintain with respect to other drivers. Also, the open-closed principle is followed because if Microsoft or a third party driver vendor wants to have a new functionality it can be written as a new filter driver to extend the functionality the old ones were offering. This way the old functionality is still provided, and the new ones can work independently without modifying the old components.
+	   
+	   	\paragraph{}
+	   	Figure \ref{fig:driverstack} displays a driver stack containing basic drivers in a stack. The bus driver is at the bottom of the stack because it is closest to hardware. Filter drivers, which are optional, add functionality to the bus an function drivers. And finally, the function driver is the one which provides the operational interface for the device.
+	    
+	   	\begin{figure}[h!]
+	   		\begin{center}
+		   		\includegraphics[scale=0.7]{images/DriverStack.jpg}
+		   		\caption{Driver stack\cite{WindowsDriverTutorial}}
+		   		\label{fig:driverstack}
+	   		\end{center}
+	   	\end{figure}
+	   
+	   
 		\subsection{Windows Filter Manager}
+		\paragraph{}
+		During the years, a lot of problem with legacy filter drivers were starting to push the developer community to find solution to ease filters development. One great inconvenience is the fact that all IRP operation must be processed thus being a hard process. Due this and many other reasons, Microsoft decided to come with a solution regarding file system filters, which has been the development of Windows Filter Manager Driver. Nowadays files system filters are not supported anymore on newest Windows versions.
+		
+		\paragraph{}
+		Filter Manager is a Windows driver containing functionality commonly required by drivers that intend to filter the file system. This set of functionalities is installed by default on Windows, but it only becomes active when a minifilter driver is loaded. \cite{MSDNFltMgrConcepts} Some of the features from Filter Manager are loading/unloading a minifilter any time, having more control over where the minifilter is loaded in terms of altitude and also volume it attaches to and the most important feature being the possibility to filter IRPs by registering callbacks that are called before the operation is started (Pre callbacks) and after the operation is completed (Post callbacks). 
+		
+		\paragraph{}	
+		Pre callbacks can be used to provide additional functionality to the file system stack, allowing developers to complete the IRP themselves. Post callbacks are useful when a decision must be made based on the IRP completion information (i.e. status). Both pre and post callbacks have two important input parameters: \\ a PFLT\_CALLBACK\_DATA structure and a PCFLT\_RELATED\_OBJECTS structure. The first one is a view over the IRP that is presented to the minifilter driver. The second one is a structure that contains pointers to the objects that are related to the operation being processed (i.e. Volume, FileObject).
+		
+		\paragraph{}
+		The altitude is a unique string identifier, interpreted as a number, which represents the position where a minifilter driver is loaded relative to other minifilters. The allocation of altitudes is managed by Microsoft thus the developers having to request an altitude in order to launch their driver into the market. \cite{MSDNFltMgrConcepts}
+		
+		\paragraph{}
+		In minifilters, and not only, there are a set of load order groups for file system filters, which are loaded at system startup. These load order groups represent the order in which drivers will be loaded in memory. \cite{MSDNFltMgrConcepts} Load order groups are common for legacy filter drivers and minifilters, but the difference is that minifilters have the altitude therefore having an exact order in which the drivers will be loaded in spite of legacy filter drivers where filters having the same load order group will be loaded in memory in a random order.
+		
+		\begin{figure}[h!]
+			\begin{center}
+				\includegraphics{images/FilterManager.jpg}
+				\caption{Filter Manager \cite{MSDNFltMgrConcepts}}
+				\label{fig:filterManager}
+			\end{center}
+		\end{figure}
 		
 		
-		concepts : Altitude
+		\paragraph{}
+		In figure \ref{fig:filterManager} we can see the path an I/O request can take from User Mode through Kernel Mode. First of all, the user request transforms into an IRP initialized by the I/O manager. After creation, the IRP gets passed through drives, one of them being Filter Manager. Next step is to pass the IRP through every minifilter registered with Filter Manager until  last minifilter is reached or until completion. After the last minifilter is reached and the IRP has not been completed, the IRP goes through the next drivers until it reaches the lowest one in the stack.
 		
+		\paragraph{}
+		Setting the I/O stack location is no longer a concern for the developer because Filter Manager has this functionality already implemented.
 			
-		
-	\newpage
+	\newpage		
 	\section{Design and Implementation}
-		\subsection{Minifilter High Level Overview of Design}
-		//TODO
-		* describe the structure of the minifilter driver
+		\paragraph{}
+		In this chapter I will start to explain in detail the main features of the application. Following steps are to explain the logic for file blocking which is the key feature of the application. Also, for a better understanding of the whole process I will present the communication between application's components. Finally, as the development process is not easy for a new developer, I will state some of the challenges which I encountered.
+	
+		\subsection{High Level Overview of Design}
+		\paragraph{}
+		Designed application is layered in 3 main components: \ref{fig:FPMAinComponents}
+		\begin{itemize}
+			\item fpf.sys
+			\item FileProtectorCore.dll
+			\item FileProtectorUI.exe
+		\end{itemize}
 		
-		\subsection{IRP Filtering}
-		IRPs (I/O request packets) are Windows kernel mode structures that are used to incorporate . 
+		\paragraph{}
+		The first component, fpf.sys, is a minifilter driver built in C. It encapsulates the logic for file blocking, communicating with the dll through a filter port.
 		
-		* what type of IRPs exist
+		\paragraph{}
+		Secondly, FileProtectorCore.dll, built in C, exposes a set of APIs which can be used to communicate with the driver. This dll can be used for future integration in another applications.
 		
-		* which IRPs I filter
+		\begin{figure}[h!]
+			\begin{center}
+				\includegraphics{images/fpMainComponents.jpg}
+				\caption{File Protector main components}
+				\label{fig:FPMAinComponents}
+			\end{center}
+		\end{figure}
 		
-		* how i filter the IRPs 
+		
+		\paragraph{}
+		Last component represents the GUI which was developed with WPF which is part of .NET Framework. This application is always running and it can be found on the system tray. Users have the following features:
+		
+		\begin{itemize}
+			\item adding a file to a protected files list
+			\item removing a file from the protected files list
+			\item start or stop file blocking
+			\item see a history with allowed/denied files
+			\item see statistics about protected files
+		\end{itemize}
 		
 		\subsection{Monitoring and Denying Access}
-		//TODO
+		\paragraph{}
+		This subsection emphasizes the main feature of the application, the file blocking. This is accomplished using the Filter Manager framework by filtering IRP\_MJ \_CREATE IRPs issued down the file system stack and matching file paths against a database of known protected files. 
 		
-		*diagram + code of how and where exactly it happens
+		
+		This is achieved by registering pre and post callbacks by calling FltRegisterFilter. I/O operations filtering is started by calling FltStartFiltering. Denying access is achieved by completing the IRP\_MJ\_CREATE in the pre callback and also setting the IoStatus.Status field of the \textcolor{Emerald} {PFLT\_CALLBACK\_DATA} input parameter to \textcolor{Magenta} {STATUS\_ACCESS\_DENIED}.
+		
+		\begin{figure}[h!]
+			\begin{center}
+				\includegraphics[scale=0.7]{images/SequenceDiagram.jpg}
+				\caption{File Blocking}
+				\label{fig:FPFBlockFileDiagram}
+			\end{center}
+		\end{figure}
+	
+		\paragraph{}
+		Diagram \ref{fig:FPFBlockFileDiagram} shows a flow where a file from the protected files list is accessed and the user chooses to deny access to it. When a file is about to be opened, an IRP\_MJ\_CREATE is sent to the Filter Manager which calls the Pre callbacks for all registered minifilters with the \textcolor{Emerald} {PFLT\_CALLBACK\_DATA} structure containing a view of the IRP. fpf.sys has to get the file path by calling FltGetFileNameInformation. As parameters, this function requires the \textcolor{Emerald}{PFLT\_CALLBACK\_DATA}, \textcolor{Emerald} {FLT\_FILE\_NAME \_OPTIONS} which specifies the name format for the returned file path, and lastly \textcolor{Emerald} {PFLT\_FILE\_NAME\_INFORMATION} which is an output parameter where the file path will be stored. The following code is the minifilter's call of FltGetFileNameInformation:
+		
+		\begin{Verbatim}[fontsize=\small, commandchars=\\\{\}]
+		FltGetFileNameInformation(\\
+		              \textcolor{Gray}{Data}, \\
+		              \textcolor{magenta}{FLT\_FILE\_NAME\_NORMALIZED \textbar} \\
+		              \textcolor{magenta}{FLT\_FILE\_NAME\_QUERY\_ALWAYS\_ALLOW\_CACHE\_LOOKUP}, \\
+		              \&fileInformation \\
+		)
+		\end{Verbatim}
+		
+		\textcolor{magenta}{FLT\_FILE\_NAME\_NORMALIZED} is required to get the normalized name. The other possibility was using \textcolor{magenta}{FLT\_FILE\_NAME\_OPENED} but this could possibly give us unresolved paths (i.e. short paths), basically returning the path that was used to open the file. Short paths in Windows are created in case of file names longer than MS-DOS 8.3 naming convention, meaning the file name should have maximum 8 characters and it's extension maximum 3 characters.
+		
+		This is potentially dangerous because a malicious application could try to bypass the File Protector by accessing a file through its short name. Example of short for paths: c:\textbackslash test\textbackslash shortpathtest1.txt, c:\textbackslash test\textbackslash shortpathtest1.txtlong and \\ c:\textbackslash test\textbackslash shortpathtest1.txtlong \ref{fig:ShortPaths}
+		
+		\begin{figure}[h!]
+			\begin{center}
+				\includegraphics{images/ShortPaths.jpg}
+				\caption{Short Paths}
+				\label{fig:ShortPaths}
+			\end{center}
+		\end{figure}
+	
+		It can be seen how the filename is truncated and appended a tilde and an index (i.e. SHORTP~1\ref{fig:ShortPaths}). In order to obtain the "real" NT path, we need to normalize the path by using the flag previously described.
+		
+		\textcolor{magenta}{FLT\_FILE\_NAME\_QUERY\_ALWAYS\_ALLOW\_CACHE\_LOOKUP} first checks filter manager cache if name is already resolved. In case it is not, it queries the file system for the file name, by opening the file, if it is currently safe to do so.
+		
+		\paragraph{}
+		After the path has been solved, a notification is sent into the dll using FltSendMessage. The communication needs a \textcolor{Emerald}{PFLT\_PORT} which needs to be created with FltCreateCommunicationPort in the minifilter and opened with FilterConnectCommunicationPort in the dll. Then the message is retrieved and a toast notification is displayed. \ref{fig:ToastNotification}
+		
+		\begin{figure}[h!]
+			\begin{center}
+				\includegraphics{images/ToastNotification.jpg}
+				\caption{Toast Notification}
+				\label{fig:ToastNotification}
+			\end{center}
+		\end{figure}
+	
+		\paragraph{}
+		In case the "More" button is pressed, a secure desktop will be opened displaying the full path and the process trying to open the file. The secure desktop is necessary because we need to create a window that cannot get messages from any other process. By creating a new desktop specifically for our window, other processes will not be able to send messages (i.e. SendMessage, PostMessage) to our window because they will not have a handle for it. For a new desktop to be created, the following functions needed to be imported from user32.dll and kernel32.dll: GetThreadDesktop, GetCurrentThreadId, CreateDesktop, SwitchDesktop, SetThreadDesktop and CloseDesktop. 
+		
+		\paragraph{}
+		Firstly, the old desktop should be preserved for recall and that was done by calling GetThreadDesktop(GetCurrentThreadId()) and keeping the returned value into a variable. To create the desktop and make it visible the calls should be performed in this order: CreateDesktop, SwitchDesktop. After the user made a choice, the old desktop must be restored to the initial state preforming the following calls: SwitchDesktop, SetThreadDesktop, CloseDesktop. 
+		
+		After the user denies the file opening, user's option is sent to the dll which sends it further to the minifilter by calling FilterSendMessage. The driver will block the file depending on user's response. 
+	
+	
+		\subsection{Inter Component Communication}
+		\paragraph{}
+		As said before, communication between the minifilter driver and the dll are done through a filter port. The cases where the dll and the driver need to communicate are the following:
+		\begin{itemize}
+			\item when a user adds a file to the protected files list a notification must be sent from user mode to kernel mode
+			\item when a file that is protected is opened the minifilter must send a notification to user mode for user approval
+		\end{itemize}
+			
+		\paragraph{}
+		Communication between user mode and kernel mode is supported by the Filter Manager. The minifilter driver can create communication port which will begin to listen for incoming connections by default. 
+		
+		Port's security is handled in the minifilter driver by specifying a security descriptor. Among  Windows APIs we can find a variety of functions regarding creating and initializing a security descriptor for a new object from which I used FltBuildDefaultSecurityDescriptor. This function builds a security descriptor that can be further applied to a communication port which means only users with system administrator privileges will have access to the port. \cite{MSDNCommunication}
+		
+		\paragraph{}
+		FltCreateCommunicationPort demands 3 callbacks used for communication between kernel mode and user mode: one that will be called when a client connects on the port, one that is called when a client disconnects, and one which is called when user mode applications call FilterSendMessage to send a message to the minifilter driver through the port. \cite{MSDNCommunication}
+		
+
+		For a client to connect on the filer port, FilterConnectCommunicationPort must be used. After the call has succeeded, FilterSendMessage can be used to communicate from user mode to kernel mode and FilterGetMessage is used to wait for messages sent from kernel mode to user mode.\cite{MSDNCommunication}
+		
+		
+		\paragraph{}
+		The path of a file can contain multiple components separated by a backslash. The prefix of a path, which determines the namespace, depends on system's interpretation. In user mode, full file paths start with a drive letter (volume name) followed by a backslash like C:$\backslash$ or D:$\backslash$. Another way of naming files is using the Universal Naming Convention (UNC), which is commonly used for accessing remote file shares (i.e. $\backslash$$\backslash$ServerName$\backslash$ShareName$\backslash$FileName).
+		
+		\begin{figure}[h!]
+			\begin{center}
+				\includegraphics[scale=0.6]{images/WinObj.jpg}
+				\caption{WinObj GLOBAL?? namespace}
+				\label{fig:WinObj}
+			\end{center}
+		\end{figure}
+		
+		The Windows kernel uses NT paths, meaning that volumes will be named differently from the usual user mode volume name, like "$\backslash$Device$\backslash$HarddiskVolume4" instead of the C:$\backslash$ drive letter. For example, if we have the DOS path C:$\backslash$folder1$\backslash$file.txt, the corresponding NT path will be similar to: $\backslash$Device$\backslash$HarddiskVolume4$\backslash$folder1$\backslash$file.txt  \cite{MSDNNamespaces}. That's because "C:" is a DOS device, which is actually a symbolic link to the actual device (i.e. $\backslash$Device$\backslash$HarddiskVolume4).
+		
+		WinObj is a Windows Sysinternals tool that uses Windows APIs to access and display information about namespaces. If we go to the GLOBAL?? namespace in WinObj, we can see thatthat C: and D: have as symbolic links $\backslash$Device$\backslash$HarddiskVolume4 and $\backslash$Device$\backslash$HarddiskVolume5, as highlighted in figure figure \ref{fig:WinObj} .
+		
+		When paths are sent from user mode to kernel mode, they must be converted to NT paths by resolving the drive letter symbolic link by calling the ZwQuerySymbolicLinkObject API.
 		
 		\subsection{Encountered Challenges}
-		//TODO  
+		\paragraph{}
+		Developing a minifilter driver development process is different from what most of programmers are used to because it requires a lot of attention and especially knowledge of Windows drivers in order to get a satisfying end result.
 		
-		* process of installation of a minifilter driver on a test machine
+		\paragraph{}
+		One of the first challenges I want to talk about is testing. Windows drivers must be tested on a test machine, because any little mistake could lead to compromising system's availability. In order to test my code I've created a Windows 10 Pro x64 virtual machine. For drivers to be loaded, Windows requests drivers to be signed with a certificate obtained from a trusted certification authority. However, for testing purposes the drivers can be signed with a test certificate and thus Windows does not load test-signed drivers. 
 		
-		\subsection{Inter Component Communication}
-		//TODO
+		\paragraph{}
+		In order to load a driver with a test signature the machine has to be set to test mode which is done through following commandline (it must be opened with administrator rights):
 		
-		* make some diagrams to make it more clear
+		\bigskip
+		\centerline {\texttt{bcdedit -set testsigning on}}
+		\bigskip
 		
+		\paragraph{}
+		The result can be seen almost immediately because a watermark will be shown on the lower right side of the screen and the driver with test signature can be loaded.
+		
+		\paragraph{}
+		Another challenge was debugging the driver. Because every bug would lead to a BSOD(Blue Screen of Death) debugging is a good solution when it comes to testing newly added code. Similar to setting the machine as a test one, kernel debugging should be enabled with the command:
+		
+		\bigskip
+		\centerline {\texttt{bcdedit -set debug on}}
+		\bigskip
+		
+		\paragraph{}
+		 When it comes to creating a new desktop, WPF does not support creating windows in the newly created desktop. The result was a window with a close button and nothing rendered on it. A solution for this issue was creating a Windows Forms Window instead of a WPF one, and it will be displayed correctly.
 		
 	\newpage
-	
 	\section{Testing Approach}
+		\paragraph{}
 		In order to achieve a reliable software, the application has been tested using both black box and white box testing methods, which will be described in the following sections.
 		
 		\subsection{Driver Verifier}
+		\paragraph{}
 		First of all I will describe some basic functionalities of Driver Verifier, that I have also used to test the minifilter.
 		
+		\paragraph{}
 		As the name suggests, Driver Verifier is a tool that can monitor Windows kernel drivers. It can detect major problems, such as memory leaks, memory corruptions or deadlocks. This tool is developed by Microsoft, making it's first appearance in Windows XP as a command line utility. Over the time this tool has gained more checks as well as a graphical user interface namely Driver Verifier Manager, that allow a programmer to select the preferences for driver's testing.
 		
 		\subsection{Static Code Analysis}
+		\paragraph{}
 		In this section I will talk about source code annotation language (SAL). This is used to make the code more explicit, in terms of behavior, parameters, return values, or other things* to make it more understandable. In other words, programmer's work is to use annotations considering the desired functionalities, and compiler's work is to verify if the written code corresponds with the annotations. 
 		
-		All SAL annotations have a specific "look", and that is \texttt{\_Annotation\_name\_}. For example, some parameter most used SAL annotations are \texttt{\_In\_} and \texttt{\_Out\_}. \texttt{\_In\_} makes sure the compiler interprets data as being input data that cannot be modified in function's scope. \texttt{\_Out\_} allows the programmer to use the parameter as an output one, as long as the space for that parameter has been allocated by the programmer.
+		\paragraph{}
+		All SAL annotations have a specific "look", and that is \texttt{\_Annotation\_name\_}. For example, some parameter most used SAL annotations are \textcolor{magenta}{\texttt{\_In\_}} and \textcolor{magenta}{\texttt{\_Out\_}}. \textcolor{magenta}{\texttt{\_In\_}} makes sure the compiler interprets data as being input data that cannot be modified in function's scope. \textcolor{magenta}{\texttt{\_Out\_}} allows the programmer to use the parameter as an output one, as long as the space for that parameter has been allocated by the programmer.
 		
-		As for behavior, a simple example is \texttt{\_Check\_return\_}. If this annotation is used, the caller must inspect the returned value. In case the function has a void return type, an error will be shown at compilation time. A similar example is \texttt{\_Must\_inspect\_result\_}, which contains the functionality of \texttt{\_Check\_return\_} and adds that any output parameter should also be used after the function call.
+		\paragraph{}
+		As for behavior, a simple example is \textcolor{magenta}{\texttt{\_Check\_return\_}}. If this annotation is used, the caller must inspect the returned value. In case the function has a void return type, an error will be shown at compilation time. A similar example is \textcolor{magenta}{\texttt{\_Must\_inspect\_result\_}}, which contains the functionality of \textcolor{magenta}{\texttt{\_Check\_return\_}} and adds that any output parameter should also be used after the function call.
 		
+		\paragraph{}
+		The following example is the MessageNotifyCallback that is called whenever a user calls FilterSendMessage to send a message to the driver. 
+		
+		\textcolor{magenta}{\_In\_opt\_} is used to indicate that there is an input parameter that may be also null.
+		
+		\textcolor{magenta}{\_In\_reads\_bytes\_opt\_}
+		
+		
+		\begin{Verbatim}[fontsize=\small, commandchars=\\\{\}]
+		\textcolor{Emerald}{NTSTATUS}
+		\textcolor{magenta}{FLTAPI} FpOnClientNotify(
+		\textcolor{magenta}{\_In\_opt\_} \textcolor{Emerald}{PVOID} \textcolor{Gray}{PortCookie},
+		\textcolor{magenta}{\_In\_reads\_bytes\_opt\_}(\textcolor{Gray}{InputBufferLength}) \textcolor{Emerald}{PVOID} \textcolor{Gray}{InputBuffer},
+		\textcolor{magenta}{\_In\_} \textcolor{Emerald}{ULONG} \textcolor{Gray}{InputBufferLength},
+		\textcolor{magenta}{\_Out\_writes\_bytes\_to\_opt\_}(\textcolor{Gray}{OutputBufferLength}, *\textcolor{Gray}{ReturnOutputBufferLength}) \textcolor{Emerald}{PVOID} \textcolor{Gray}{OutputBuffer},
+		\textcolor{magenta}{\_In\_} \textcolor{Emerald}{ULONG} \textcolor{Gray}{OutputBufferLength},
+		\textcolor{magenta}{\_Out\_} \textcolor{Emerald}{PULONG} \textcolor{Gray}{ReturnOutputBufferLength}
+		)
+		
+		\end{Verbatim}
+		
+		
+		\paragraph{}
 		After these examples anyone should be convinced that SAL is beneficial from multiple reasons, and that is also why I used it in my own code.
-		
-		//TODO
-		My code examples
-		
+	
