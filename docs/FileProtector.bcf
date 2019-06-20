@@ -1996,23 +1996,31 @@
   </bcf:bibdata>
   <bcf:section number="0">
     <bcf:citekey order="1">MDSNDACsLACEs</bcf:citekey>
-    <bcf:citekey order="2">MSDNWhatIsADriver</bcf:citekey>
-    <bcf:citekey order="3">MSDNWhatIsADriver</bcf:citekey>
-    <bcf:citekey order="4">MSDNIORequests</bcf:citekey>
-    <bcf:citekey order="5">MSDNIOStackLocations</bcf:citekey>
-    <bcf:citekey order="6">MSDNIOStackLocations</bcf:citekey>
-    <bcf:citekey order="7">MSDNWDMDrivers</bcf:citekey>
-    <bcf:citekey order="8">MSDNWDMDrivers</bcf:citekey>
-    <bcf:citekey order="9">MSDNWDMDrivers</bcf:citekey>
-    <bcf:citekey order="10">WindowsDriverTutorial</bcf:citekey>
-    <bcf:citekey order="11">MSDNFltMgrConcepts</bcf:citekey>
-    <bcf:citekey order="12">MSDNFltMgrConcepts</bcf:citekey>
-    <bcf:citekey order="13">MSDNFltMgrConcepts</bcf:citekey>
-    <bcf:citekey order="14">MSDNFltMgrConcepts</bcf:citekey>
-    <bcf:citekey order="15">MSDNCommunication</bcf:citekey>
-    <bcf:citekey order="16">MSDNCommunication</bcf:citekey>
-    <bcf:citekey order="17">MSDNCommunication</bcf:citekey>
-    <bcf:citekey order="18">MSDNNamespaces</bcf:citekey>
+    <bcf:citekey order="2">RedirFS</bcf:citekey>
+    <bcf:citekey order="3">KernelArchivesVFS</bcf:citekey>
+    <bcf:citekey order="4">LinuxKernelDevelopment</bcf:citekey>
+    <bcf:citekey order="5">LinuxKernelDevelopment</bcf:citekey>
+    <bcf:citekey order="6">LinuxKernelDevelopment</bcf:citekey>
+    <bcf:citekey order="7">MSDNWhatIsADriver</bcf:citekey>
+    <bcf:citekey order="8">MSDNWhatIsADriver</bcf:citekey>
+    <bcf:citekey order="9">MSDNIORequests</bcf:citekey>
+    <bcf:citekey order="10">WindowsInternals</bcf:citekey>
+    <bcf:citekey order="11">WindowsInternals</bcf:citekey>
+    <bcf:citekey order="12">WindowsInternals</bcf:citekey>
+    <bcf:citekey order="13">MSDNIOStackLocations</bcf:citekey>
+    <bcf:citekey order="14">MSDNIOStackLocations</bcf:citekey>
+    <bcf:citekey order="15">MSDNWDMDrivers</bcf:citekey>
+    <bcf:citekey order="16">MSDNWDMDrivers</bcf:citekey>
+    <bcf:citekey order="17">MSDNWDMDrivers</bcf:citekey>
+    <bcf:citekey order="18">WindowsDriverTutorial</bcf:citekey>
+    <bcf:citekey order="19">MSDNFltMgrConcepts</bcf:citekey>
+    <bcf:citekey order="20">MSDNFltMgrConcepts</bcf:citekey>
+    <bcf:citekey order="21">MSDNFltMgrConcepts</bcf:citekey>
+    <bcf:citekey order="22">MSDNFltMgrConcepts</bcf:citekey>
+    <bcf:citekey order="23">MSDNCommunication</bcf:citekey>
+    <bcf:citekey order="24">MSDNCommunication</bcf:citekey>
+    <bcf:citekey order="25">MSDNCommunication</bcf:citekey>
+    <bcf:citekey order="26">MSDNNamespaces</bcf:citekey>
     <bcf:citekey order="0" nocite="1">*</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->

@@ -70,59 +70,57 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {paragraph}{}{6}{paragraph*.28}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {2.3}Linux Proof of Concept}{7}{section.2.3}% 
+\contentsline {section}{\numberline {2.3}Linux Implementation Overview}{7}{section.2.3}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {2.4}Windows Kernel Development}{8}{section.2.4}% 
+\contentsline {paragraph}{}{7}{paragraph*.29}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {2.4.1}Windows Drivers}{8}{subsection.2.4.1}% 
+\contentsline {subsection}{\numberline {2.3.1}RedirFS}{7}{subsection.2.3.1}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{8}{paragraph*.29}% 
+\contentsline {paragraph}{}{7}{paragraph*.30}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{8}{paragraph*.30}% 
+\contentsline {paragraph}{}{7}{paragraph*.31}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{8}{paragraph*.31}% 
+\contentsline {paragraph}{}{7}{paragraph*.32}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{9}{paragraph*.32}% 
+\contentsline {paragraph}{}{7}{paragraph*.33}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{9}{paragraph*.33}% 
+\contentsline {paragraph}{}{8}{paragraph*.34}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{9}{paragraph*.34}% 
+\contentsline {paragraph}{}{8}{paragraph*.35}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{9}{paragraph*.35}% 
+\contentsline {section}{\numberline {2.4}Windows Kernel Development}{9}{section.2.4}% 
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.4.1}Windows Drivers}{9}{subsection.2.4.1}% 
 \defcounter {refsection}{0}\relax 
 \contentsline {paragraph}{}{9}{paragraph*.36}% 
 \defcounter {refsection}{0}\relax 
 \contentsline {paragraph}{}{9}{paragraph*.37}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{10}{paragraph*.38}% 
+\contentsline {paragraph}{}{9}{paragraph*.38}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{10}{paragraph*.39}% 
+\contentsline {paragraph}{}{11}{paragraph*.39}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{10}{paragraph*.40}% 
+\contentsline {paragraph}{}{11}{paragraph*.40}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{10}{paragraph*.41}% 
+\contentsline {paragraph}{}{11}{paragraph*.41}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {2.4.2}Windows Filter Manager}{11}{subsection.2.4.2}% 
+\contentsline {paragraph}{}{12}{paragraph*.42}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{11}{paragraph*.42}% 
+\contentsline {paragraph}{}{12}{paragraph*.43}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{11}{paragraph*.43}% 
+\contentsline {paragraph}{}{12}{paragraph*.44}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{11}{paragraph*.44}% 
+\contentsline {paragraph}{}{12}{paragraph*.45}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{11}{paragraph*.45}% 
+\contentsline {paragraph}{}{12}{paragraph*.46}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{11}{paragraph*.46}% 
-\defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{11}{paragraph*.47}% 
+\contentsline {paragraph}{}{12}{paragraph*.47}% 
 \defcounter {refsection}{0}\relax 
 \contentsline {paragraph}{}{12}{paragraph*.48}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {2.5}Design and Implementation}{13}{section.2.5}% 
+\contentsline {subsection}{\numberline {2.4.2}Windows Filter Manager}{12}{subsection.2.4.2}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{13}{paragraph*.49}% 
-\defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {2.5.1}High Level Overview of Design}{13}{subsection.2.5.1}% 
+\contentsline {paragraph}{}{12}{paragraph*.49}% 
 \defcounter {refsection}{0}\relax 
 \contentsline {paragraph}{}{13}{paragraph*.50}% 
 \defcounter {refsection}{0}\relax 
@@ -130,77 +128,75 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {paragraph}{}{13}{paragraph*.52}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{13}{paragraph*.53}% 
-\defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {2.5.2}Monitoring and Denying Access}{14}{subsection.2.5.2}% 
+\contentsline {paragraph}{}{14}{paragraph*.53}% 
 \defcounter {refsection}{0}\relax 
 \contentsline {paragraph}{}{14}{paragraph*.54}% 
 \defcounter {refsection}{0}\relax 
 \contentsline {paragraph}{}{14}{paragraph*.55}% 
 \defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.5}Design and Implementation}{15}{section.2.5}% 
+\defcounter {refsection}{0}\relax 
 \contentsline {paragraph}{}{15}{paragraph*.56}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{16}{paragraph*.57}% 
+\contentsline {subsection}{\numberline {2.5.1}High Level Overview of Design}{15}{subsection.2.5.1}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{16}{paragraph*.58}% 
+\contentsline {paragraph}{}{15}{paragraph*.57}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {2.5.3}Inter Component Communication}{16}{subsection.2.5.3}% 
+\contentsline {paragraph}{}{15}{paragraph*.58}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{16}{paragraph*.59}% 
+\contentsline {paragraph}{}{15}{paragraph*.59}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{17}{paragraph*.60}% 
+\contentsline {paragraph}{}{15}{paragraph*.60}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{17}{paragraph*.61}% 
+\contentsline {subsection}{\numberline {2.5.2}Monitoring and Denying Access}{16}{subsection.2.5.2}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{17}{paragraph*.62}% 
+\contentsline {paragraph}{}{16}{paragraph*.61}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {2.5.4}Encountered Challenges}{18}{subsection.2.5.4}% 
+\contentsline {paragraph}{}{16}{paragraph*.62}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{18}{paragraph*.63}% 
+\contentsline {paragraph}{}{17}{paragraph*.63}% 
 \defcounter {refsection}{0}\relax 
 \contentsline {paragraph}{}{18}{paragraph*.64}% 
 \defcounter {refsection}{0}\relax 
 \contentsline {paragraph}{}{18}{paragraph*.65}% 
 \defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.5.3}Inter Component Communication}{18}{subsection.2.5.3}% 
+\defcounter {refsection}{0}\relax 
 \contentsline {paragraph}{}{18}{paragraph*.66}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{18}{paragraph*.67}% 
+\contentsline {paragraph}{}{19}{paragraph*.67}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{18}{paragraph*.68}% 
-\defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {2.6}Testing Approach}{19}{section.2.6}% 
+\contentsline {paragraph}{}{19}{paragraph*.68}% 
 \defcounter {refsection}{0}\relax 
 \contentsline {paragraph}{}{19}{paragraph*.69}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {2.6.1}Driver Verifier}{19}{subsection.2.6.1}% 
+\contentsline {subsection}{\numberline {2.5.4}Encountered Challenges}{20}{subsection.2.5.4}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{19}{paragraph*.70}% 
+\contentsline {paragraph}{}{20}{paragraph*.70}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{19}{paragraph*.71}% 
+\contentsline {paragraph}{}{20}{paragraph*.71}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {2.6.2}Static Code Analysis}{19}{subsection.2.6.2}% 
+\contentsline {paragraph}{}{20}{paragraph*.72}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{19}{paragraph*.72}% 
+\contentsline {paragraph}{}{20}{paragraph*.73}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{19}{paragraph*.73}% 
+\contentsline {paragraph}{}{20}{paragraph*.74}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{19}{paragraph*.74}% 
+\contentsline {paragraph}{}{20}{paragraph*.75}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{19}{paragraph*.75}% 
+\contentsline {section}{\numberline {2.6}Testing Approach}{21}{section.2.6}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{20}{paragraph*.76}% 
+\contentsline {paragraph}{}{21}{paragraph*.76}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {3}Further Work}{21}{chapter.3}% 
-\defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.1}File name matching efficiency}{21}{section.3.1}% 
+\contentsline {subsection}{\numberline {2.6.1}Driver Verifier}{21}{subsection.2.6.1}% 
 \defcounter {refsection}{0}\relax 
 \contentsline {paragraph}{}{21}{paragraph*.77}% 
 \defcounter {refsection}{0}\relax 
 \contentsline {paragraph}{}{21}{paragraph*.78}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{}{21}{paragraph*.79}% 
+\contentsline {subsection}{\numberline {2.6.2}Static Code Analysis}{21}{subsection.2.6.2}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.2}Enterprise environment integration}{21}{section.3.2}% 
+\contentsline {paragraph}{}{21}{paragraph*.79}% 
 \defcounter {refsection}{0}\relax 
 \contentsline {paragraph}{}{21}{paragraph*.80}% 
 \defcounter {refsection}{0}\relax 
@@ -210,7 +206,9 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {paragraph}{}{22}{paragraph*.83}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {4}Conclusion}{23}{chapter.4}% 
+\contentsline {chapter}{\numberline {3}Further Work}{23}{chapter.3}% 
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3.1}File name matching efficiency}{23}{section.3.1}% 
 \defcounter {refsection}{0}\relax 
 \contentsline {paragraph}{}{23}{paragraph*.84}% 
 \defcounter {refsection}{0}\relax 
@@ -218,4 +216,22 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {paragraph}{}{23}{paragraph*.86}% 
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{Bibliography}{24}{chapter*.87}% 
+\contentsline {section}{\numberline {3.2}Enterprise environment integration}{23}{section.3.2}% 
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{}{23}{paragraph*.87}% 
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{}{23}{paragraph*.88}% 
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{}{24}{paragraph*.89}% 
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{}{24}{paragraph*.90}% 
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {4}Conclusion}{25}{chapter.4}% 
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{}{25}{paragraph*.91}% 
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{}{25}{paragraph*.92}% 
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{}{25}{paragraph*.93}% 
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{Bibliography}{26}{chapter*.94}% 

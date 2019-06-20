@@ -80,7 +80,76 @@
 	As a conclusion, the only time a password is required, is when the application is started. 
 	
 	\newpage
-	\section{Linux Proof of Concept}
+	\section{Linux Implementation Overview}
+	\paragraph{}
+	This section is focused on presenting a potential implementation for the file protector filter on UNIX systems. There are two theoretically possible approaches. The first one leverages the VFS in implementing a "Filter Manager"-like framework. The second one is a more intrusive and dangerous technique that is based on system call hooking. 
+	
+	\subsection{RedirFS}
+	\paragraph{}
+	As stated in the RedirFS paper it is a new layer a new layer between virtual file
+	system switch (VFS) and file system drivers\cite{RedirFS}. Is implemented as a standalone kernel module and modifies file system calls in VFS in order to provide a minfilter-like experience for filtering file system operations.
+	
+	\paragraph{}
+	The Virtual File System (also known as the Virtual Filesystem Switch) is the software layer in the kernel that provides the filesystem interface to userspace programs. It also provides an abstraction
+	within the kernel which allows different filesystem implementations to coexist\cite{KernelArchivesVFS}. This mechanism is very similar to the Windows I/O System which will be detailed later in this chapter.
+	
+	\paragraph{}
+	The VFS is the glue that enables system calls such as \texttt{open()}, \texttt{read()}, and \texttt{write()} to work regardless of the filesystem or underlying physical medium\cite{LinuxKernelDevelopment}. VFS provides an interface that is implemented by file system drivers, such as Ext4. The file concept is the base of VFS, because everything is viewed as a file. ProcFS is an example of a pseudo-file system driver, because it uses the VFS to expose a file system-like interface to the user. In instance, a user could query the running processes list either by the traditional \texttt{ps} command or, by making use of VFS, a user could use \texttt{ls} command to list processed in the following manner:
+	
+	\bigskip
+	\centerline{ls $-$l /proc}
+	\bigskip
+	
+	This command will show us the active processes by showing a directory for each process, with the process PID as the directory name. This also shows other relevant system information, such as pci connected devices (/proc/bus/pci).
+	
+	\paragraph{}
+	VFS uses 4 type of objects, namely:
+	
+	\begin{itemize}
+		\item superblock object, which represents a specific mounted system
+		\item inode represents a file 
+		\item dentry is a directory entry which represents a single component of a path
+		\item file object represents an opened file
+	\end{itemize}
+	
+	Each of the aforementioned contains an operations object which are pointers to functions that the kernel invokes against the primary objects.
+	
+	\paragraph{}
+	The file\_operations structure contains two function pointers that are of interest in the context of implementing a file protector on Linux: \\
+	
+	\begin{Verbatim}[fontsize=\small, commandchars=\\\{\}]
+	struct file_operations \{ 
+		...
+		int (*open) (struct inode *, struct file *); 
+		...
+		int (*release) (struct inode *, struct file *); 
+		...
+	\}	
+	\end{Verbatim}
+	
+	The \texttt{open()} callback creates a new file object and links it to the corresponding inode object. It is called by the \texttt{open()} system call\cite{LinuxKernelDevelopment}. This is the most important callback because it allows synchronous interception of file open semantics as well as allowing the possibility to resolve the request inside the filter. A Linux implementation of the file protector would complete the file system request with the \texttt{EPERM} status in order to block access.\\ 
+	
+	The \texttt{release()} callback by the VFS when the last remaining reference to the file is destroyed. For example, when the last process sharing a file descriptor calls \texttt{close()} or exits. Its purpose is file system-dependent\cite{LinuxKernelDevelopment}. This call has no functional utility for the file protector. It is only used to clean up control structures for opened file objects after it goes out of scope. 
+	
+	\paragraph{} 
+	User mode communication can be easily achieved leveraging the SysFS pseudo-file system which is mounted at /sys. With the help of \texttt{kobject\_create\_and\_add} a driver can export an object to SysFS. \\
+	
+	\begin{Verbatim}[fontsize=\small, commandchars=\\\{\}]
+struct kobject * kobject_create_and_add (
+			const char * name, 
+			struct kobject * parent
+		);
+	\end{Verbatim}
+	
+	The location of the kobject in the SysFS hierarchy depends on the parent kobject (the second parameter). For kernel\_kobj the function will create a directory under /sys/kernel. 
+	
+	The following code snippet, taken from RedirFS will create a directory named redirfs under /sys/fs. That's because instead of passing kernel\_kobj as second parameter it passes fs\_kobj. 
+	
+	\begin{Verbatim}[fontsize=\small, commandchars=\\\{\}]
+	rfs_kobj = kobject_create_and_add("redirfs", fs_kobj);
+	\end{Verbatim}
+	
+	This mechanism allows us to easily pass messages between user and kernel through the exposed SysFS entry by responding to user mode requests (i.e. open, read, write syscalls).
 	
 	
 	\newpage
@@ -105,11 +174,36 @@
 		
 			\centerline{\textcolor{blue}{struct} \textcolor{cyan}{\texttt{\_IO\_STACK\_LOCATION}} *\textcolor{cyan}{CurrentStackLocation}}
 		
-		\bigskip
+		\bigskip	
 		\paragraph{}
-		I/O manager takes care for each driver to have an I/O stack location for every IRP. As an overview, the I/O manager creates for every IRP an array with I/O stack locations, every element corresponding to driver.
+		The Windows I/O system consists of several executive components that, together, manage hardware devices and provide interfaces to hardware devices for applications and the system\cite{WindowsInternals}. It is a packet driven system, with requests being usually backed by structures named IRPs. It is also possible that these requests to bypass the IRP-driven mechanism and go straight to the driver to complete the I/O request. This mechanism is called "Fast I/O".
+		
+		The I/O manager is responsible with IRP lifecycle management and also with passing them to the correct device stack in order to be properly processed. This places the I/O manager at the core of the I/O system. 
+		
+		
+		The operating system abstracts all I/O requests as operations on a virtual file because the I/O manager has no knowledge of anything but files, therefore making it the responsibility of the driver to translate fileoriented comments (open, close, read, write) into device-specific commands\cite{WindowsInternals}. As an example, a driver implementing pipe/FIFO mechanics would complete the read/write requests using the in-memory buffers instead of having an actual underlying physical device. 
+		
+		As it can be seen, the I/O system is very similar to the Linux VFS as it also provides a common interface that is implemented by both file system and pseudo-file system drivers (ProcFS - file system-like interface for querying process information).\\
+		
+	
+		\begin{figure}[h!]
+			\begin{center}
+				\includegraphics[scale=0.9]{images/IORequest.jpg}
+				\caption{The flow of a typical I/O request\cite{WindowsInternals}}
+				\label{fig:IORequest}
+			\end{center}
+		\end{figure}
+		\pagebreak
+
+		The common I/O processing path can be seen in image \ref{fig:IORequest}.
+
+		Firstly, the application issues a system call to the operating system. Then, once it reaches the kernel, an IRP is allocated and sent to the corresponding driver. The driver can resolve the request by sending one or multiple I/O requests towards a physical device. It can also resolve the request without the help of any physical hardware support by considering the request to be for a virtual resource (i.e. filter port, pipe)
+		
 		
 		\paragraph{}
+		An IRP contains multiple useful pieces of information, like completion status, pend state, data buffer, etc. It also contains an array of IO\_STACK\_LOCATION structures which contain IRP parameters (i.e. creation flags, read/write buffer sizes). There is one stack location for each driver on the stack. When the IRP is passed down the stack, each driver is responsible with setting up the io stack location for the next driver in the stack either by copying the existing one or by setting up a completely different one. For example, an activity monitor would pass the parameters as they are to the next driver, but an encryption filter would change the parameters because it has to encrypt the data, thus leading to different buffer contents and buffer sizes.
+		
+		
 		The I/O stack location of an IRP is comprised of the following information: \cite{MSDNIOStackLocations}
 		\begin{itemize}
 			\item IRP\_MJ\_*  - a major function code that the driver should handle
@@ -326,9 +420,9 @@
 			\end{center}
 		\end{figure}
 		
-		The Windows kernel uses NT paths, meaning that volumes will be named differently from the usual user mode volume name, like "$\backslash$Device$\backslash$HarddiskVolume4" instead of the C:$\backslash$ drive letter. For example, if we have the DOS path C:$\backslash$folder1$\backslash$file.txt, the corresponding NT path will be similar to: $\backslash$Device$\backslash$HarddiskVolume4$\backslash$folder1$\backslash$file.txt  \cite{MSDNNamespaces}. That's because "C:" is a DOS device, which is actually a symbolic link to the actual device (i.e. $\backslash$Device$\backslash$HarddiskVolume4).
+		The Windows kernel uses NT paths, meaning that volumes will be named differently from the usual user mode volume name, like "$\backslash$Device$\backslash$HarddiskVolume4" instead of the C:$\backslash$ drive letter. For example, if we have the DOS path C:$\backslash$folder1$\backslash$file.txt, the corresponding NT path will be similar to: $\backslash$Device$\backslash$HarddiskVolume4$\backslash$folder1$\backslash$ file.txt  \cite{MSDNNamespaces}. That's because "C:" is a DOS device, which is actually a symbolic link to the actual device (i.e. $\backslash$Device$\backslash$HarddiskVolume4).
 		
-		WinObj is a Windows Sysinternals tool that uses Windows APIs to access and display information about namespaces. If we go to the GLOBAL?? namespace in WinObj, we can see thatthat C: and D: have as symbolic links $\backslash$Device$\backslash$HarddiskVolume4 and $\backslash$Device$\backslash$HarddiskVolume5, as highlighted in figure figure \ref{fig:WinObj} .
+		WinObj is a Windows Sysinternals tool that uses Windows APIs to access and display information about namespaces. If we go to the GLOBAL?? namespace in WinObj, we can see thatthat C: and D: have as symbolic links $\backslash$Device$\backslash$ HarddiskVolume4 and $\backslash$Device$\backslash$HarddiskVolume5, as highlighted in figure figure \ref{fig:WinObj} .
 		
 		When paths are sent from user mode to kernel mode, they must be converted to NT paths by resolving the drive letter symbolic link by calling the ZwQuerySymbolicLinkObject API.
 		
@@ -381,28 +475,33 @@
 		\paragraph{}
 		As for behavior, a simple example is \textcolor{magenta}{\texttt{\_Check\_return\_}}. If this annotation is used, the caller must inspect the returned value. In case the function has a void return type, an error will be shown at compilation time. A similar example is \textcolor{magenta}{\texttt{\_Must\_inspect\_result\_}}, which contains the functionality of \textcolor{magenta}{\texttt{\_Check\_return\_}} and adds that any output parameter should also be used after the function call.
 		
-		\paragraph{}
 		The following example is the MessageNotifyCallback that is called whenever a user calls FilterSendMessage to send a message to the driver. 
 		
-		\textcolor{magenta}{\_In\_opt\_} is used to indicate that there is an input parameter that may be also null.
-		
-		\textcolor{magenta}{\_In\_reads\_bytes\_opt\_}
-		
-		
+		\pagebreak
 		\begin{Verbatim}[fontsize=\small, commandchars=\\\{\}]
-		\textcolor{Emerald}{NTSTATUS}
-		\textcolor{magenta}{FLTAPI} FpOnClientNotify(
-		\textcolor{magenta}{\_In\_opt\_} \textcolor{Emerald}{PVOID} \textcolor{Gray}{PortCookie},
-		\textcolor{magenta}{\_In\_reads\_bytes\_opt\_}(\textcolor{Gray}{InputBufferLength}) \textcolor{Emerald}{PVOID} \textcolor{Gray}{InputBuffer},
-		\textcolor{magenta}{\_In\_} \textcolor{Emerald}{ULONG} \textcolor{Gray}{InputBufferLength},
-		\textcolor{magenta}{\_Out\_writes\_bytes\_to\_opt\_}(\textcolor{Gray}{OutputBufferLength}, *\textcolor{Gray}{ReturnOutputBufferLength}) \textcolor{Emerald}{PVOID} \textcolor{Gray}{OutputBuffer},
-		\textcolor{magenta}{\_In\_} \textcolor{Emerald}{ULONG} \textcolor{Gray}{OutputBufferLength},
-		\textcolor{magenta}{\_Out\_} \textcolor{Emerald}{PULONG} \textcolor{Gray}{ReturnOutputBufferLength}
-		)
+\textcolor{Emerald}{NTSTATUS}
+\textcolor{magenta}{FLTAPI} FpOnClientNotify(
+\textcolor{magenta}{\_In\_opt\_} \textcolor{Emerald}{PVOID} \textcolor{Gray}{PortCookie},
+\textcolor{magenta}{\_In\_reads\_bytes\_opt\_}(\textcolor{Gray}{InputBufferLength}) \textcolor{Emerald}{PVOID} \textcolor{Gray}{InputBuffer},
+\textcolor{magenta}{\_In\_} \textcolor{Emerald}{ULONG} \textcolor{Gray}{InputBufferLength},
+\textcolor{magenta}{\_Out\_writes\_bytes\_to\_opt\_}(\textcolor{Gray}{OutputBufferLength}, *\textcolor{Gray}{ReturnOutputBufferLength})
+\textcolor{Emerald}{PVOID} \textcolor{Gray}{OutputBuffer},
+\textcolor{magenta}{\_In\_} \textcolor{Emerald}{ULONG} \textcolor{Gray}{OutputBufferLength},
+\textcolor{magenta}{\_Out\_} \textcolor{Emerald}{PULONG} \textcolor{Gray}{ReturnOutputBufferLength}
+)
 		
 		\end{Verbatim}
 		
+		\paragraph{}
+		The SAL annotations encountered here have the following meanings:
+		\begin{itemize}
+			\item \textcolor{magenta}{\_In\_} - input parameters are treated as read-only 
+			\item \textcolor{magenta}{\_In\_opt\_} - is used to indicate that there is an input parameter that may be also null.
+			\item \textcolor{magenta}{\_In\_reads\_bytes\_opt\_}(s) - this means the function has to read from the array with size s that was given. The \_bytes\_ means that the size given is in bytes, not in elements. \_opt\_ allows also null values to be provided.
+			\item \textcolor{magenta}{\_Out\_} - the caller of the function provides space for the output parameter, which the function must write to.
+			\item \textcolor{magenta}{\_Out\_writes\_bytes\_to\_opt\_}(s, c) - here s represents the maximum size of an array in elements (bytes in this case), and c is the number of elements that must be valid in post-state. In this case, the output buffer can hold a maximum number of \texttt{OutputBufferLength} bytes, and \texttt{*ReturnOutputBufferLength} will hold the number of bytes that was actually written.
+		\end{itemize}
 		
 		\paragraph{}
-		After these examples anyone should be convinced that SAL is beneficial from multiple reasons, and that is also why I used it in my own code.
+		This mentioned examples emphasize why SAL is beneficial, and that is also why it was used for the minifilter driver development.
 	

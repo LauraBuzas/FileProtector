@@ -93,8 +93,8 @@ namespace FileProtectorUI
             InitializeComponent();
             PopulateFilesList();
             syncCtx = SynchronizationContext.Current;
-            worker = new Thread(NotificationWorker);
-            worker.Start();
+            //worker = new Thread(NotificationWorker);
+            //worker.Start();
         }
 
         private void NotificationWorker()
@@ -240,7 +240,7 @@ namespace FileProtectorUI
                 passwordTextBox.Width = 250;
                 //passwordTextBox.Font = new Font("Arial", 20, FontStyle.Regular);
 
-                loginWnd.Controls.Add(passwordTextBox);`
+                loginWnd.Controls.Add(passwordTextBox);
                 loginWnd.FormClosing += (sndr, evt) => { passwd = passwordTextBox.Text; };
                 loginWnd.ShowDialog();
             });

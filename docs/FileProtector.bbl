@@ -69,6 +69,28 @@
       \field{year}{2019}
       \true{nocite}
     \endentry
+    \entry{KernelArchivesVFS}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=9da0bd25c4399e2f1026ce9ef6ac7613}{%
+           family={Gooch},
+           familyi={G\bibinitperiod},
+           given={Richard},
+           giveni={R\bibinitperiod}}}%
+      }
+      \strng{namehash}{9da0bd25c4399e2f1026ce9ef6ac7613}
+      \strng{fullhash}{9da0bd25c4399e2f1026ce9ef6ac7613}
+      \strng{bibnamehash}{9da0bd25c4399e2f1026ce9ef6ac7613}
+      \strng{authorbibnamehash}{9da0bd25c4399e2f1026ce9ef6ac7613}
+      \strng{authornamehash}{9da0bd25c4399e2f1026ce9ef6ac7613}
+      \strng{authorfullhash}{9da0bd25c4399e2f1026ce9ef6ac7613}
+      \field{sortinit}{G}
+      \field{sortinithash}{5e8d2bf9d38de41b1528bd307546008f}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{\url{https://www.kernel.org/doc/Documentation/filesystems/vfs.txt}}
+      \field{title}{Overview of the Linux Virtual File System}
+      \true{nocite}
+    \endentry
     \entry{MDSNDACsLACEs}{misc}{}
       \name{author}{1}{}{%
         {{hash=140864078aeca1c7c35b4beb33c53c34}{%
@@ -238,6 +260,14 @@
       \field{year}{2018}
       \true{nocite}
     \endentry
+    \entry{RedirFS}{misc}{}
+      \field{sortinit}{R}
+      \field{sortinithash}{da6b42bd3ab22fee61abed031ee405f7}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{\url{https://github.com/fhrbata/redirfs}}
+      \field{title}{RedirFS}
+      \true{nocite}
+    \endentry
     \entry{KernelBasedMonitoringOnWindows}{inproceedings}{}
       \name{author}{1}{}{%
         {{hash=e77f11485944e4ce18fb74e09bae42da}{%
@@ -264,6 +294,31 @@
       \verb{url}
       \verb https://bitnuts.de/KernelBasedMonitoring.pdf
       \endverb
+    \endentry
+    \entry{LinuxKernelDevelopment}{book}{}
+      \name{author}{1}{}{%
+        {{hash=e688ce1e79802b0cc224ef15226a1058}{%
+           family={{Robert Love}},
+           familyi={R\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Pearson Education, Inc.}%
+      }
+      \strng{namehash}{e688ce1e79802b0cc224ef15226a1058}
+      \strng{fullhash}{e688ce1e79802b0cc224ef15226a1058}
+      \strng{bibnamehash}{e688ce1e79802b0cc224ef15226a1058}
+      \strng{authorbibnamehash}{e688ce1e79802b0cc224ef15226a1058}
+      \strng{authornamehash}{e688ce1e79802b0cc224ef15226a1058}
+      \strng{authorfullhash}{e688ce1e79802b0cc224ef15226a1058}
+      \field{sortinit}{R}
+      \field{sortinithash}{da6b42bd3ab22fee61abed031ee405f7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{edition}{Third Edition}
+      \field{title}{Linux Kernel Development}
+      \field{year}{2010}
+      \true{nocite}
+      \keyw{Linux Kernel Development}
     \endentry
     \entry{WindowsInternals}{book}{}
       \name{author}{1}{}{%
