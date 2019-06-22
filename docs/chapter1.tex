@@ -1,6 +1,6 @@
 \chapter{Introduction}
 	\paragraph{}
-	Privacy is one of the things humanity has been keen on in the last few decades. To achieve safety software-wise, as a first thing, you would like to protect personal data. 
+	Privacy is one of the things humanity has been keen on in the last few decades. To achieve safety software-wise, as a first thing, a person would like to protect personal data. 
 	
 	\paragraph{}
 	What is important to keep in mind regarding data security is a matter of three concepts, namely availability, confidentiality and integrity, each one them having a high importance. Data availability means that it is available at any time, in case the user tries to access it.
@@ -18,19 +18,19 @@
 	The main objective of this paper is to describe the process of design and implementation of a solution that tackles the integrity problem mentioned above. The designed solution is composed of: a minifilter driver that contains the monitoring and protection logic, a DLL that is an abstract interface over the minifilter functionality, and a Windows Desktop application built on top of WPF (Windows Presentation Foundation). 
 	
 	\paragraph{}
-	The second chapter of this paper contains four sections. First section is an high level overview of a few existing products, containing their description and functionality. Second section is divided in three main subjects: Windows Filter Manager where I'll be discussing the minifilter framework and how it can be used to achieve our proposed objective, C and .NET where I will motivate why I've chosen to use these languages. Third section is a detailed view of solution's design and implementation, especially the minifilter logic and communication. Last section focuses on how the application was tested.
+	The second chapter contains Linux and Windows built in protection file mechanisms as well as a product similar to the file protector. This chapter also goes into detail about Linux mechanisms and a potential design for the file protector in order to make it run on UNIX systems. Then, it describes the needed Windows theoretical concepts, such as the I/O manager and the Filter Manager, in order to implement the described product. Moreover, it goes into the specifics of the implementation as well as the testing approach. 
 	
 	\paragraph{}
-	Third chapter describes the further work that can be done to add more functionality to the current application. 
+	Third chapter describes the further work that can be done to add more functionality to the current application. These improvements contain both performance enhancements and extended functionality.  
 	
 	\paragraph{}
-	Last chapter is a conclusion of the paper, summing up the main ideas.
+	Last chapter is a conclusion of the paper, summing up the main ideas. Here the need for such a product is restated and its main goals and the means of achieving them are concluded.
 		
 	\section{Personal Contribution}
 	\paragraph{}
-	Designing an SDK (Software Development Kit) that can be integrated by third-parties. My work consists of providing a documented interface for integrators in order to easily manage file protection rules that are based on Windows Kernel-level mechanisms.
+	The main contribution consists of designing an SDK (Software Development Kit) that can be integrated by third-parties. My work consists of providing a documented interface for integrators in order to easily manage file protection rules that are based on Windows Kernel-level mechanisms.
 	
 	\paragraph{}
-	The purpose of this is to provide an abstraction.
+	The purpose of this is to provide an abstraction over a kernel module that contains all the logic for monitoring and blocking unauthorized file access. Moreover, this interface should be easy to use for third-party vendors.
 	
 	

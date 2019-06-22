@@ -7,19 +7,21 @@
 \BOOKMARK [1][-]{section.2.2}{Existing products for Windows}{chapter.2}% 7
 \BOOKMARK [1][-]{section.2.3}{Linux Implementation Overview}{chapter.2}% 8
 \BOOKMARK [2][-]{subsection.2.3.1}{RedirFS}{section.2.3}% 9
-\BOOKMARK [1][-]{section.2.4}{Windows Kernel Development}{chapter.2}% 10
-\BOOKMARK [2][-]{subsection.2.4.1}{Windows Drivers}{section.2.4}% 11
-\BOOKMARK [2][-]{subsection.2.4.2}{Windows Filter Manager}{section.2.4}% 12
-\BOOKMARK [1][-]{section.2.5}{Design and Implementation}{chapter.2}% 13
-\BOOKMARK [2][-]{subsection.2.5.1}{High Level Overview of Design}{section.2.5}% 14
-\BOOKMARK [2][-]{subsection.2.5.2}{Monitoring and Denying Access}{section.2.5}% 15
-\BOOKMARK [2][-]{subsection.2.5.3}{Inter Component Communication}{section.2.5}% 16
-\BOOKMARK [2][-]{subsection.2.5.4}{Encountered Challenges}{section.2.5}% 17
-\BOOKMARK [1][-]{section.2.6}{Testing Approach}{chapter.2}% 18
-\BOOKMARK [2][-]{subsection.2.6.1}{Driver Verifier}{section.2.6}% 19
-\BOOKMARK [2][-]{subsection.2.6.2}{Static Code Analysis}{section.2.6}% 20
-\BOOKMARK [0][-]{chapter.3}{Further Work}{}% 21
-\BOOKMARK [1][-]{section.3.1}{File name matching efficiency}{chapter.3}% 22
-\BOOKMARK [1][-]{section.3.2}{Enterprise environment integration}{chapter.3}% 23
-\BOOKMARK [0][-]{chapter.4}{Conclusion}{}% 24
-\BOOKMARK [0][-]{chapter*.94}{Bibliography}{}% 25
+\BOOKMARK [2][-]{subsection.2.3.2}{System Call Hooking}{section.2.3}% 10
+\BOOKMARK [1][-]{section.2.4}{Malware}{chapter.2}% 11
+\BOOKMARK [1][-]{section.2.5}{Windows Kernel Development}{chapter.2}% 12
+\BOOKMARK [2][-]{subsection.2.5.1}{Windows Drivers}{section.2.5}% 13
+\BOOKMARK [2][-]{subsection.2.5.2}{Windows Filter Manager}{section.2.5}% 14
+\BOOKMARK [1][-]{section.2.6}{Design and Implementation}{chapter.2}% 15
+\BOOKMARK [2][-]{subsection.2.6.1}{High Level Overview of Design}{section.2.6}% 16
+\BOOKMARK [2][-]{subsection.2.6.2}{Monitoring and Denying Access}{section.2.6}% 17
+\BOOKMARK [2][-]{subsection.2.6.3}{Inter Component Communication}{section.2.6}% 18
+\BOOKMARK [2][-]{subsection.2.6.4}{Encountered Challenges}{section.2.6}% 19
+\BOOKMARK [1][-]{section.2.7}{Testing Approach}{chapter.2}% 20
+\BOOKMARK [2][-]{subsection.2.7.1}{Driver Verifier}{section.2.7}% 21
+\BOOKMARK [2][-]{subsection.2.7.2}{Static Code Analysis}{section.2.7}% 22
+\BOOKMARK [0][-]{chapter.3}{Further Work}{}% 23
+\BOOKMARK [1][-]{section.3.1}{File name matching efficiency}{chapter.3}% 24
+\BOOKMARK [1][-]{section.3.2}{Enterprise environment integration}{chapter.3}% 25
+\BOOKMARK [0][-]{chapter.4}{Conclusion}{}% 26
+\BOOKMARK [0][-]{chapter*.105}{Bibliography}{}% 27

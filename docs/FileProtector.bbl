@@ -69,6 +69,15 @@
       \field{year}{2019}
       \true{nocite}
     \endentry
+    \entry{MSDNDriverVerifier}{misc}{}
+      \field{sortinit}{D}
+      \field{sortinithash}{2ef1bd9a78cc71eb74d7231c635177b8}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{\url{https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/driver-verifier}}
+      \field{title}{Driver Verifier}
+      \field{year}{2017}
+      \true{nocite}
+    \endentry
     \entry{KernelArchivesVFS}{misc}{}
       \name{author}{1}{}{%
         {{hash=9da0bd25c4399e2f1026ce9ef6ac7613}{%
@@ -89,6 +98,55 @@
       \field{labeltitlesource}{title}
       \field{howpublished}{\url{https://www.kernel.org/doc/Documentation/filesystems/vfs.txt}}
       \field{title}{Overview of the Linux Virtual File System}
+      \true{nocite}
+    \endentry
+    \entry{CISSP}{book}{}
+      \name{author}{1}{}{%
+        {{hash=77e66fa8d4e48e6b5fc2b876095a33b1}{%
+           family={Harris},
+           familyi={H\bibinitperiod},
+           given={Shon},
+           giveni={S\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {McGraw-Hill Osborne Media}%
+      }
+      \strng{namehash}{77e66fa8d4e48e6b5fc2b876095a33b1}
+      \strng{fullhash}{77e66fa8d4e48e6b5fc2b876095a33b1}
+      \strng{bibnamehash}{77e66fa8d4e48e6b5fc2b876095a33b1}
+      \strng{authorbibnamehash}{77e66fa8d4e48e6b5fc2b876095a33b1}
+      \strng{authornamehash}{77e66fa8d4e48e6b5fc2b876095a33b1}
+      \strng{authorfullhash}{77e66fa8d4e48e6b5fc2b876095a33b1}
+      \field{sortinit}{H}
+      \field{sortinithash}{5f15a7bc777ad49ff15aa4d2831b1681}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{edition}{6th}
+      \field{isbn}{9780071781749}
+      \field{title}{CISSP All-in-One Exam Guide}
+      \field{year}{2012}
+      \true{nocite}
+    \endentry
+    \entry{CritBitTrees}{article}{}
+      \name{author}{1}{}{%
+        {{hash=9f7c1bea618246029e139c169baaf321}{%
+           family={Langley},
+           familyi={L\bibinitperiod},
+           given={Adam},
+           giveni={A\bibinitperiod}}}%
+      }
+      \strng{namehash}{9f7c1bea618246029e139c169baaf321}
+      \strng{fullhash}{9f7c1bea618246029e139c169baaf321}
+      \strng{bibnamehash}{9f7c1bea618246029e139c169baaf321}
+      \strng{authorbibnamehash}{9f7c1bea618246029e139c169baaf321}
+      \strng{authornamehash}{9f7c1bea618246029e139c169baaf321}
+      \strng{authorfullhash}{9f7c1bea618246029e139c169baaf321}
+      \field{sortinit}{L}
+      \field{sortinithash}{2c7981aaabc885868aba60f0c09ee20f}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{\url{https://www.imperialviolet.org/binary/critbit.pdf}}
+      \field{title}{Crit-bit Trees}
       \true{nocite}
     \endentry
     \entry{MDSNDACsLACEs}{misc}{}
@@ -319,6 +377,28 @@
       \field{year}{2010}
       \true{nocite}
       \keyw{Linux Kernel Development}
+    \endentry
+    \entry{AnIntroductionToMalware}{article}{}
+      \name{author}{1}{}{%
+        {{hash=f9f5c9114881c6e98ebf6f0f2a7003c8}{%
+           family={Sharp},
+           familyi={S\bibinitperiod},
+           given={Robin},
+           giveni={R\bibinitperiod}}}%
+      }
+      \strng{namehash}{f9f5c9114881c6e98ebf6f0f2a7003c8}
+      \strng{fullhash}{f9f5c9114881c6e98ebf6f0f2a7003c8}
+      \strng{bibnamehash}{f9f5c9114881c6e98ebf6f0f2a7003c8}
+      \strng{authorbibnamehash}{f9f5c9114881c6e98ebf6f0f2a7003c8}
+      \strng{authornamehash}{f9f5c9114881c6e98ebf6f0f2a7003c8}
+      \strng{authorfullhash}{f9f5c9114881c6e98ebf6f0f2a7003c8}
+      \field{sortinit}{S}
+      \field{sortinithash}{322b1d5276f2f6c1bccdcd15920dbee6}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{An Introduction to Malware}
+      \field{year}{2017}
+      \true{nocite}
     \endentry
     \entry{WindowsInternals}{book}{}
       \name{author}{1}{}{%
