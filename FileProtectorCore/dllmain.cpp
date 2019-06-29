@@ -2,6 +2,7 @@
 #include <fltuser.h>
 
 HANDLE gFilterPort;
+BYTE gNotificationBuffer[4096];
 
 void Init()
 {
@@ -61,6 +62,7 @@ DllMain(
 
 typedef struct _NOTIFICATION_FILE_NAME_MATCHED
 {
+	FILTER_MESSAGE_HEADER Header;
 	ULONG Pid;
 	USHORT Length;
 	wchar_t Buffer[0];
@@ -72,8 +74,13 @@ typedef struct _CMD_PROTECT_FILE
 	wchar_t Buffer[0];
 }CMD_PROTECT_FILE, *PCMD_PROTECT_FILE;
 
-#pragma pack(pop)
+typedef struct _NOTIFICATION_REPLY
+{
+	FILTER_REPLY_HEADER Header;
+	BOOLEAN Block;
+}NOTIFICATION_REPLY, *PNOTIFICATION_REPLY;
 
+#pragma pack(pop)
 #pragma warning(pop)
 
 /*
@@ -84,18 +91,18 @@ CopyMemory(buffer, path, length * sizeof(wchar_t));
 */
 extern "C"
 {
-	
+
 
 	__declspec(dllexport)
-	int
-	function()
+		int
+		function()
 	{
 		return 1;
 	}
-	
+
 	__declspec(dllexport)
-	char*
-	function2()
+		char*
+		function2()
 	{
 		char *str = (char *)malloc(sizeof(char) * 3);
 		str[0] = 'm';
@@ -106,15 +113,15 @@ extern "C"
 	}
 
 	__declspec(dllexport)
-	void
-	ProtectFile(
-		wchar_t* Path,
-		USHORT Length
-	)
+		void
+		ProtectFile(
+			wchar_t* Path,
+			USHORT Length
+		)
 	{
 		UNREFERENCED_PARAMETER(Path);
 		UNREFERENCED_PARAMETER(Length);
-		/*HRESULT status = E_FAIL;
+		HRESULT status = E_FAIL;
 		PCMD_PROTECT_FILE cmdProtect = NULL;
 		DWORD ret = 0;
 		DWORD size = sizeof(CMD_PROTECT_FILE) + Length * (sizeof(wchar_t));
@@ -136,26 +143,65 @@ extern "C"
 			;
 		}
 
-		free(cmdProtect);*/
+		free(cmdProtect);
+	}
+
+	__declspec(dllexport)
+		HRESULT
+		GetNextNotification(
+			wchar_t** Path,
+			PULONG Pid,
+			PULONGLONG MessageId
+		)
+	{
+		DWORD bytesTransfered = 0;
+		ZeroMemory((PVOID)gNotificationBuffer, 4096);
+		OVERLAPPED ovlp = { 0 };
+		ovlp.hEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+
+		HRESULT status = FilterGetMessage(
+			gFilterPort,
+			(PFILTER_MESSAGE_HEADER)gNotificationBuffer,
+			4096,
+			&ovlp
+		);
+		if (!SUCCEEDED(status) && status != HRESULT_FROM_WIN32(ERROR_IO_PENDING))
+		{
+			return status;
+		}
+
+		if (!GetOverlappedResult(gFilterPort, &ovlp, &bytesTransfered, TRUE))
+		{
+			return HRESULT_FROM_WIN32(GetLastError());
+		}
+
+
+		size_t pathLength = ((PNOTIFICATION_FILE_NAME_MATCHED)gNotificationBuffer)->Length + sizeof('\0');
+		wchar_t* path = (wchar_t*)malloc(pathLength);
+		SecureZeroMemory(path, pathLength);
+
+		*Pid = ((PNOTIFICATION_FILE_NAME_MATCHED)gNotificationBuffer)->Pid;
+		*MessageId = ((PNOTIFICATION_FILE_NAME_MATCHED)gNotificationBuffer)->Header.MessageId;
+
+		CopyMemory(path, ((PNOTIFICATION_FILE_NAME_MATCHED)gNotificationBuffer)->Buffer, ((PNOTIFICATION_FILE_NAME_MATCHED)gNotificationBuffer)->Length);
+		*Path = path;
+		return S_OK;
 	}
 
 	__declspec(dllexport)
 	HRESULT
-	GetNextNotification(
-		wchar_t** Path,
-		PULONG Pid
+	BlockAccess(
+		ULONGLONG MessageId,
+		BOOLEAN Block
 	)
 	{
-		*Pid = 3;
-		wchar_t* path = (wchar_t*)malloc(6);
-		path[0] = L'a';
-		path[1] = L'a';
-		path[2] = L'\0';
-		*Path = path;
+		NOTIFICATION_REPLY reply = { 0 };
+		reply.Header.Status = 0;
+		reply.Header.MessageId = MessageId;
+		reply.Block = Block;
 
-		//FilterGetMessage(gFilterPort, )
-
-		return S_OK;
+		HRESULT status = FilterReplyMessage(gFilterPort, (PFILTER_REPLY_HEADER)&reply, sizeof(reply));
+		return status;
 	}
 
 	__declspec(dllexport)

@@ -4,30 +4,29 @@ PFLT_FILTER gFilterHandle;
 
 UNICODE_STRING gProtectedPath;
 
+UNICODE_STRING gDummyString = RTL_CONSTANT_STRING(L"dummy_test");
+
 PFLT_PORT gPort;
 UNICODE_STRING gPortName = RTL_CONSTANT_STRING(L"\\FpPort");
 
 PFLT_PORT gClientPort;
 
-typedef struct _PROTECTED_PATH_ENTRY
-{
-	PVOID Path;
-	LIST_ENTRY ListEntry;
-}PROTECTED_PATH_ENTRY, *PPROTECTED_PATH_ENTRY;
-
-LIST_ENTRY gProtectedPaths;
-/*
-(PPROTECTED_PATH_ENTRY)gProtectedPaths->Flink;
-
-auto entry = CONTAINING_RECORD(flink, PROTECTED_PATH_ENTRY, ListEntry)
-
-*/
 
 #pragma warning(push)
 #pragma warning(disable: 4200)
 
 #pragma pack(push)
 #pragma pack(1)
+
+LIST_ENTRY gProtectedPaths;
+
+
+
+typedef struct _PROTECTED_PATH_ENTRY
+{
+	UNICODE_STRING Path;
+	LIST_ENTRY ListEntry;
+}PROTECTED_PATH_ENTRY, *PPROTECTED_PATH_ENTRY;
 
 typedef struct _NOTIFICATION_FILE_NAME_MATCHED
 {
@@ -76,13 +75,20 @@ FpPreOperation(
 		FltReleaseFileNameInformation(fileInformation);
 		return FLT_PREOP_SUCCESS_NO_CALLBACK;
 	}
-	if (gProtectedPath.Buffer) {
-		BOOLEAN result = RtlEqualUnicodeString(&gProtectedPath, &fileInformation->Name, TRUE);
+
+	PLIST_ENTRY currentEntry;
+	currentEntry = gProtectedPaths.Flink;
+
+	while (currentEntry != &gProtectedPaths)
+	{
+		PPROTECTED_PATH_ENTRY ppe = CONTAINING_RECORD(currentEntry, PROTECTED_PATH_ENTRY, ListEntry);
+		BOOLEAN result = RtlEqualUnicodeString(&ppe->Path, &fileInformation->Name, TRUE);
 
 		if (!result) {
-			return FLT_PREOP_SUCCESS_NO_CALLBACK;
+			currentEntry = currentEntry->Flink;
+			continue;
 		}
-		
+
 		PNOTIFICATION_FILE_NAME_MATCHED notification = NULL;
 		ULONG msgSize = sizeof(NOTIFICATION_FILE_NAME_MATCHED) + fileInformation->Name.MaximumLength;
 		notification = ExAllocatePoolWithTag(PagedPool, msgSize, '1GT#');
@@ -90,8 +96,8 @@ FpPreOperation(
 		notification->Length = fileInformation->Name.MaximumLength;
 		RtlCopyMemory(notification->Buffer, fileInformation->Name.Buffer, fileInformation->Name.MaximumLength);
 
-		BOOLEAN shouldBlock = FALSE;
-		ULONG shouldBlockSize = sizeof(BOOLEAN);
+		BOOLEAN shouldBlock = { 0 };
+		ULONG shouldBlockSize = sizeof(shouldBlock);
 
 
 		status = FltSendMessage(
@@ -104,17 +110,18 @@ FpPreOperation(
 			NULL
 		);
 		ExFreePoolWithTag(notification, '1GT#');
-		FltReleaseFileNameInformation(fileInformation);
 		if (!NT_SUCCESS(status)) {
+			FltReleaseFileNameInformation(fileInformation);
 			return FLT_PREOP_SUCCESS_NO_CALLBACK;
 		}
 
 		if (shouldBlock) {
 			Data->IoStatus.Status = STATUS_ACCESS_DENIED;
 			Data->IoStatus.Information = 0;
+			FltReleaseFileNameInformation(fileInformation);
 			return FLT_PREOP_COMPLETE;
 		}
-		return FLT_PREOP_SUCCESS_NO_CALLBACK;
+		currentEntry = currentEntry->Flink;
 	}
 	FltReleaseFileNameInformation(fileInformation);
 	return FLT_PREOP_SUCCESS_WITH_CALLBACK;
@@ -153,9 +160,17 @@ FpUnloadFunction(
 	FltCloseClientPort(gFilterHandle, &gClientPort);
 	FltCloseCommunicationPort(gPort);
 	FltUnregisterFilter(gFilterHandle);
-	if (gProtectedPath.Buffer)
+	PLIST_ENTRY currentEntry;
+	currentEntry = gProtectedPaths.Flink;
+
+	while (currentEntry != &gProtectedPaths)
 	{
-		ExFreePoolWithTag(gProtectedPath.Buffer, 'GAT#');
+		PLIST_ENTRY removeEntry = currentEntry;
+		PPROTECTED_PATH_ENTRY ppe = CONTAINING_RECORD(removeEntry, PROTECTED_PATH_ENTRY, ListEntry);
+		currentEntry = currentEntry->Flink;
+		RemoveEntryList(removeEntry);
+		ExFreePoolWithTag(ppe->Path.Buffer, 'GAT#');
+		ExFreePoolWithTag(ppe, 'EPP#');
 	}
 	return STATUS_SUCCESS;
 }
@@ -261,8 +276,6 @@ FLTAPI FpOnClientNotify(
 	UNICODE_STRING ustr = { 0 };
 	ULONG actualLenght = 0;
 
-	__debugbreak();
-
 	path.Buffer = (wchar_t*)input->Buffer;
 	path.Length = path.MaximumLength = input->Length;
 
@@ -324,12 +337,10 @@ FLTAPI FpOnClientNotify(
 	if (!NT_SUCCESS(status)) {
 		goto Exit;
 	}
-	
-	if (gProtectedPath.Buffer)
-	{
-		ExFreePoolWithTag(gProtectedPath.Buffer, 'GAT#');
-	}
-	gProtectedPath = ustr;
+
+	PPROTECTED_PATH_ENTRY ppe = ExAllocatePoolWithTag(PagedPool, sizeof(*ppe), 'EPP#');
+	ppe->Path = ustr;
+	InsertHeadList(&gProtectedPaths, &ppe->ListEntry);
 
 Exit:
 	if (out) {
@@ -349,6 +360,8 @@ DriverEntry(
 	UNREFERENCED_PARAMETER(DriverObject);
 	UNREFERENCED_PARAMETER(RegistryPath);
 
+	InitializeListHead(&gProtectedPaths);
+
 	status = FltRegisterFilter(
 		DriverObject,
 		&FltRegistration,
@@ -361,7 +374,6 @@ DriverEntry(
 
 
 	PSECURITY_DESCRIPTOR sd = NULL;
-
 	status = FltBuildDefaultSecurityDescriptor(
 		&sd,
 		FLT_PORT_ALL_ACCESS
@@ -373,7 +385,6 @@ DriverEntry(
 	}
 	
 	OBJECT_ATTRIBUTES oa = { 0 };
-
 	InitializeObjectAttributes(
 		&oa,
 		&gPortName,
@@ -393,6 +404,7 @@ DriverEntry(
 		FpOnClientNotify,
 		1
 	);
+
 	FltFreeSecurityDescriptor(sd);
 	if (!NT_VERIFY(NT_SUCCESS(status)))
 	{

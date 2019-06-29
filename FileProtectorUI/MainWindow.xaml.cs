@@ -7,6 +7,16 @@ using Windows.UI.Notifications;
 using System.Runtime.InteropServices;
 using MahApps.Metro.Controls.Dialogs;
 using static FileProtectorUI.CommonResources.Constants;
+using System.IO;
+using System.Collections;
+using System.Diagnostics;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using FileProtectorUI.Utils;
+using System.Collections.ObjectModel;
+using LiveCharts;
+using LiveCharts.Configurations;
+using LiveCharts.Wpf;
 
 namespace FileProtectorUI
 {
@@ -39,7 +49,18 @@ namespace FileProtectorUI
         void
         GetNextNotification(
             out IntPtr Path,
-            out ulong Pid
+            out ulong Pid,
+            out UInt64 MessageId
+        );
+
+        [DllImport("FileProtectorCore.dll", CharSet = CharSet.Unicode)]
+        public
+        static
+        extern
+        void
+        BlockAccess(
+            UInt64 MessageId,
+            bool Block
         );
 
         [DllImport("FileProtectorCore.dll", CharSet = CharSet.Unicode)]
@@ -87,14 +108,45 @@ namespace FileProtectorUI
                             DESKTOP_ENUMERATE | DESKTOP_WRITEOBJECTS | DESKTOP_SWITCHDESKTOP),
         }
 
+        private FileProtectorContext fp;
+        public string[] Labels { get; set; }
+        public SeriesCollection Series;
+
         public MainWindow()
         {
+            this.Closed += (sender, e) => { Environment.Exit(0); };
             var a = Marshal.PtrToStringAnsi(function2());
             InitializeComponent();
             PopulateFilesList();
+
+            fp = new FileProtectorContext();
+            PopulateHistoryList();
             syncCtx = SynchronizationContext.Current;
-            //worker = new Thread(NotificationWorker);
+            worker = new Thread(NotificationWorker);
+            worker.SetApartmentState(ApartmentState.STA);
             //worker.Start();
+            InitializeLabels();
+        }
+
+        private void InitializeLabels()
+        {
+            var currentTime = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+            Labels = new[]{
+            ((Month)((currentTime.Month - 5 + 12) % 12 + 1)).ToString(),
+            ((Month)((currentTime.Month - 4 + 12) % 12 + 1)).ToString(),
+            ((Month)((currentTime.Month - 3 + 12) % 12 + 1)).ToString(),
+            ((Month)((currentTime.Month - 2 + 12) % 12 + 1)).ToString(),
+            ((Month)currentTime.Month).ToString()
+            };
+
+            Series = new SeriesCollection
+            {
+                new ColumnSeries
+                {
+                    Values = new ChartValues<HistoryEntry>(fp.HistoryEntries.Local.ToList())
+                }
+
+            };
         }
 
         private void NotificationWorker()
@@ -103,18 +155,20 @@ namespace FileProtectorUI
             {
                 string path = null;
                 ulong pid = 0;
+                UInt64 messageId;
                 IntPtr ptr;
-                GetNextNotification(out ptr, out pid);
+                GetNextNotification(out ptr, out pid, out messageId);
+                if (ptr == IntPtr.Zero)
+                {
+                    continue;
+                }
                 path = System.Runtime.InteropServices.Marshal.PtrToStringUni(ptr);
                 bool allow = false;
-                syncCtx.Send(o => allow = ShowToastNotification(), null);
+                allow = ShowToastNotification(path, pid);
+
+                BlockAccess(messageId, !allow);
                 FreeNotification(ptr);
             }
-        }
-
-        private void ReadProtectedPaths()
-        {
-            //Registry.GetValue
         }
 
         private void BrowseButtonClick(object sender, RoutedEventArgs e)
@@ -136,11 +190,10 @@ namespace FileProtectorUI
             Nullable<bool> result = openFileDlg.ShowDialog();
             if (result == true)
             {
-                //add it in the table
+                ProtectedFiles.AddFile(openFileDlg.FileName);
+                var path = "\\??\\" + openFileDlg.FileName;
+                ProtectFile(path, (ushort)path.Length);
             }
-            ProtectedFiles.AddFile(openFileDlg.FileName);
-            var path = "\\??\\" + openFileDlg.FileName;
-            ProtectFile(path, (ushort)path.Length);
         }
 
 
@@ -163,18 +216,24 @@ namespace FileProtectorUI
             filesList.ItemsSource = ProtectedFiles.files;
         }
 
+        private void PopulateHistoryList()
+        {
+            fp.HistoryEntries.Load();
+            historyList.ItemsSource = fp.HistoryEntries.Local.ToBindingList();
+        }
+
         private void StackPanel_MouseUp(object sender, MouseButtonEventArgs e)
         {
             var panel = sender as System.Windows.Controls.StackPanel;
         }
 
-        private bool ShowToastNotification()
+        private bool ShowToastNotification(string path, ulong pid)
         {
-            var xml = @"<toast>
+            var xml = $@"<toast>
                 <visual>
                     <binding template='ToastGeneric'>
                         <text>File Protector</text>
-                        <text>Someone is trying to access your protected file: text.txt.</text>
+                        <text>{Process.GetProcessById((int)pid).ProcessName} is trying to access your protected file: {path}.</text>
                     </binding>
                 </visual>
                 <actions>
@@ -185,7 +244,7 @@ namespace FileProtectorUI
             var toastXml = new Windows.Data.Xml.Dom.XmlDocument();
             toastXml.LoadXml(xml);
             var toast = new ToastNotification(toastXml);
-            String passw = null;
+            bool allowed = false;
             ManualResetEvent evt = new ManualResetEvent(false);
             toast.Activated += (notification, esf) =>
             {
@@ -197,51 +256,82 @@ namespace FileProtectorUI
                     case "Deny":
                         break;
                     case "More":
-                        passw = InputPasswordMessageBoxLaunch();
+                        allowed = InputPasswordMessageBoxLaunch(path, pid); 
                         break;
-                    default:
+                default:
                         break;
-                }
-
+            }
                 evt.Set();
             };
-            toast.Failed += Toast_Failed;
-            toast.Dismissed += Toast_Dismissed;
+            toast.Failed += (notification, args) => {
+                allowed = false;
+                evt.Set();
+            };
+            toast.Dismissed += (notification, args) =>
+            {
+                allowed = false;
+                evt.Set();
+            };
             var t = ToastNotificationManager.CreateToastNotifier(APP_ID);
             t.Show(toast);
             evt.WaitOne();
-            return passw == "123";
+
+            App.Current.Dispatcher.Invoke((Action)delegate 
+            {
+                fp.Add(new HistoryEntry
+                {
+                    ProcessId = pid.ToString(),
+                    Path = path,
+                    Allowed = allowed,
+                    ProcessName = Process.GetProcessById((int)pid).ProcessName,
+                    TimeAccessed = DateTime.Now
+                });
+                fp.SaveChanges();
+            });
+
+
+            return allowed;
         }
 
-        private void Toast_Dismissed(ToastNotification sender, ToastDismissedEventArgs args)
-        {
-            return;
-        }
-
-        private void Toast_Failed(ToastNotification sender, ToastFailedEventArgs args)
-        {
-            return;
-        }
-
-        private string InputPasswordMessageBoxLaunch()
+        private bool InputPasswordMessageBoxLaunch(string path, ulong pid)
         {
             IntPtr hOldDesktop = GetThreadDesktop(GetCurrentThreadId());
             IntPtr pNewDesktop = CreateDesktop("NewDesktop", IntPtr.Zero, IntPtr.Zero, 0, (uint)DESKTOP_ACCESS.GENERIC_ALL, IntPtr.Zero);
 
             SwitchDesktop(pNewDesktop);
 
-            string passwd = "";
-            Thread t = new Thread(() => { //why?
+            bool allow = false;
+            Thread t = new Thread(() => { 
                 SetThreadDesktop(pNewDesktop);
 
                 Form loginWnd = new Form();
-                TextBox passwordTextBox = new TextBox();
-                passwordTextBox.Location = new System.Drawing.Point(10, 30);
-                passwordTextBox.Width = 250;
-                //passwordTextBox.Font = new Font("Arial", 20, FontStyle.Regular);
+                loginWnd.AutoSize = true;
+                Button allowButton = new Button();
+                allowButton.Text = "Allow";
+                allowButton.Click += (e, args) => {
+                    allow = true;
+                    loginWnd.Close();
+                };
+                allowButton.Location = new System.Drawing.Point(100, 100);
 
-                loginWnd.Controls.Add(passwordTextBox);
-                loginWnd.FormClosing += (sndr, evt) => { passwd = passwordTextBox.Text; };
+                Button denyButton = new Button();
+                denyButton.Text = "Deny";
+                denyButton.Click += (e, args) =>
+                {
+                    allow = false;
+                    loginWnd.Close();
+                };
+                denyButton.Location = new System.Drawing.Point(0, 100);
+
+                Label message = new Label();
+                message.Location = new System.Drawing.Point(0, 0);
+                message.Text = $"Process {Process.GetProcessById((int)pid).ProcessName} with PID: {pid} is trying to access your file: {path}. Allow Access?";
+                message.AutoSize = true;
+
+                loginWnd.Controls.Add(message);
+                loginWnd.Controls.Add(allowButton);
+                loginWnd.Controls.Add(denyButton);
+
                 loginWnd.ShowDialog();
             });
             t.SetApartmentState(ApartmentState.STA);
@@ -252,7 +342,7 @@ namespace FileProtectorUI
             SwitchDesktop(hOldDesktop);
             SetThreadDesktop(hOldDesktop);
             CloseDesktop(pNewDesktop);
-            return passwd;
+            return allow;
         }
 
         private void StackPanelMyFilesMouseDown(object sender, MouseButtonEventArgs e)
@@ -283,6 +373,15 @@ namespace FileProtectorUI
         private void StackPanelCloseMouseDown(object sender, MouseButtonEventArgs e)
         {
             this.Close();
+        }
+
+        private void ClearHistory(object sender, RoutedEventArgs e)
+        {
+            foreach (var entry in fp.HistoryEntries)
+            {
+                fp.Remove(entry);
+            }
+            fp.SaveChanges();
         }
     }
 }

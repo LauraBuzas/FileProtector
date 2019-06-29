@@ -78,14 +78,23 @@
                 <TabItem Header="History" Margin="2,-0.4,2.2,-0.4">
                     <DockPanel>
                         <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button Margin="0,0,15,15" Height="30" Width="200" HorizontalAlignment="Right" Click="ClearHistory">Clear</Button>
                         </StackPanel>
                         <ListBox Name="historyList" Margin="20" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <StackPanel MouseUp="StackPanel_MouseUp">
-                                        <TextBlock Foreground="{StaticResource Foreground}" FontSize="30" Text="{Binding Name}"/>
-                                        <TextBlock Foreground="{StaticResource Foreground}" FontSize="16" Text="{Binding Path}"/>
-                                        <TextBlock Foreground="{StaticResource Foreground}" FontSize="16" Text="{Binding DateAdded}"/>
+                                    <StackPanel>
+                                        <TextBlock Foreground="{StaticResource Foreground}" FontSize="25" Text="{Binding Path}"/>
+                                        <TextBlock Foreground="{StaticResource Foreground}" FontSize="16">
+                                            <TextBlock.Text>
+                                                <MultiBinding StringFormat="{}PID:{0}        Name: {1}">
+                                                    <Binding Path="ProcessId" />
+                                                    <Binding Path="ProcessName" />
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+                                        <TextBlock Foreground="{StaticResource Foreground}" FontSize="16" Text="{Binding Allowed}"/>
+                                        <TextBlock Foreground="{StaticResource Foreground}" FontSize="13" Text="{Binding TimeAccessed}"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
@@ -99,7 +108,7 @@
                                 <RowDefinition Height="Auto"></RowDefinition>
                                 <RowDefinition Height="*"></RowDefinition>
                             </Grid.RowDefinitions>
-                            <StackPanel Orientation="Horizontal">
+                            <!--<StackPanel Orientation="Horizontal">
                                 <CheckBox IsChecked="{Binding MariaSeriesVisibility}">
                                     Maria Series
                                 </CheckBox>
@@ -109,19 +118,10 @@
                                 <CheckBox IsChecked="{Binding JohnSeriesVisibility}">
                                     John Series
                                 </CheckBox>
-                            </StackPanel>
-                            <lvc:CartesianChart Grid.Row="1" Hoverable="False">
-                                <lvc:CartesianChart.Series>
-                                    <lvc:ColumnSeries Title="Maria" Values="4,7,2,9,3" Visibility="{Binding MariaSeriesVisibility, Mode=OneWay}" MaxWidth="1000" ColumnPadding="0"/>
-                                    <lvc:ColumnSeries Title="Charles" Values="6,2,6,3,8" Visibility="{Binding CharlesSeriesVisibility, Mode=OneWay}" MaxWidth="1000" ColumnPadding="0"/>
-                                    <lvc:ColumnSeries Title="John" Values="7,2,8,3,9" Visibility="{Binding JohnSeriesVisibility, Mode=OneWay}" MaxWidth="1000" ColumnPadding="0"/>
-                                </lvc:CartesianChart.Series>
+                            </StackPanel>-->
+                            <lvc:CartesianChart Grid.Row="1" Hoverable="True" Series="{Binding Series}">
                                 <lvc:CartesianChart.AxisX>
-                                    <lvc:Axis Labels="January, February, March, April, May">
-                                        <lvc:Axis.Separator>
-                                            <lvc:Separator Step="1"></lvc:Separator>
-                                        </lvc:Axis.Separator>
-                                    </lvc:Axis>
+                                    <lvc:Axis Labels="{Binding Labels}"></lvc:Axis>
                                 </lvc:CartesianChart.AxisX>
                             </lvc:CartesianChart>
                         </Grid>

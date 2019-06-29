@@ -6,6 +6,7 @@ using FileProtectorUI.Utils;
 using MS.WindowsAPICodePack.Internal;
 using Microsoft.WindowsAPICodePack.Shell.PropertySystem;
 using static FileProtectorUI.CommonResources.Constants;
+using Microsoft.EntityFrameworkCore;
 
 namespace FileProtectorUI
 {
@@ -18,6 +19,11 @@ namespace FileProtectorUI
 
         private bool TryCreateShortcut()
         {
+            using (FileProtectorContext dbContext = new FileProtectorContext())
+            {
+                dbContext.Database.Migrate();
+            }
+
             String shortcutPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Microsoft\\Windows\\Start Menu\\Programs\\File Protector.lnk";
             if (!File.Exists(shortcutPath))
             {

@@ -1,4 +1,4 @@
-\chapter{File Protection}
+	\chapter{File Protection}
 	\section{Built in protection}
 	\paragraph{}
 	Usually, operating systems do not have a built in mechanism that include a password protection method. However, there is a file permission policy that counts as a level of protection from other users.
@@ -53,7 +53,7 @@
 		
 	\section{Existing products for Windows}
 	\paragraph{}
-	As a similar tool, a first one that draws attention, is iBoysoft's File Protector for Windows, coming as a 7-day free trial or a payed version. As a main functionality, this tool allows the user to select the desired folders or files to be protected, along with the protection type which can be:
+	As a similar tool to the one presented in this paper, a first one that draws attention, is iBoysoft's File Protector for Windows, coming as a 7-day free trial or a payed version. As a main functionality, this tool allows the user to select the desired folders or files to be protected, along with the protection type which can be:
 	\begin{itemize}
 		\item read
 		\item write
@@ -79,15 +79,17 @@
 	There is also the settings tab which contains two sections, one where you can change the password request at application's startup, and another one where you can choose the default protection types that are selected when adding a file or folder. The second feature is a useful one because the user can select a default way for files to be protected when they are added into the list, skipping a set of settings to be made for every file addition.
 	
 	\paragraph{}
-	An example of a drawback of this application would be adding a text file for reading protection because the user cannot access it afterwords using any kind of application. However, the user can give permissions to other applications to perform actions upon the desired files. This way a user can access the file just by using that exact set of applications.
+	An inconvenience that is easily spotted when using this application is that, when a file is added to the protected files list, no process can access it. In order to let processes access it, an exception is needed for that process. This is a problem if the file needs to be accessed by more generic programs, like \texttt{cmd} or \texttt{powershell}. That's because, \texttt{cmd} or \texttt{powershell} are generic applications that can do numerous things, from accessing files to configuring services or adding firewall exceptions. If the user wants to allow \texttt{powershell} to access a protected file, an exception is needed for the \texttt{powershell} executable, thus allowing any \texttt{powershell} process to access the file, instead of allowing only a specific instance (identified by PID).
+	
+	%An example of a drawback of this application would be adding a text file for reading protection %because the user cannot access it afterwards using any kind of application. However, the user can %give permissions to other applications to perform actions upon the desired files. This way a user %can access the file just by using that exact set of applications.
 	
 	\paragraph{}
-	As a conclusion, this application provides security for a set of files which the user has selected as being protected. Moreover, there are a set of applications that a user can select to have permissions over desired files. However, the only time a password is required, is when the application is started. 
+	As a conclusion, this application provides layer of security for a set of files which the user has selected as being protected. Moreover, there are a set of applications that a user can select to have permissions over desired files.
 	
 	\newpage
 	\section{Linux Implementation Overview}
 	\paragraph{}
-	This section is focused on presenting a potential implementation for the file protector filter on UNIX systems. There are two theoretically possible approaches. The first one leverages the VFS in implementing a "Filter Manager"-like framework. The second one is a more intrusive and dangerous technique that is based on system call hooking. 
+	This section is focused on presenting a potential implementation for the file protector filter on UNIX systems. There are two theoretically possible approaches. The first one leverages the VFS in implementing a "Windows Filter Manager"-like framework, which will be explained later on. The second one is a more intrusive and dangerous technique that is based on system call hooking. 
 	
 	\subsection{RedirFS}
 	\paragraph{}
@@ -98,7 +100,7 @@
 	within the kernel which allows different filesystem implementations to coexist\cite{KernelArchivesVFS}. This mechanism is very similar to the Windows I/O System which will be detailed later in this chapter.
 	
 	\paragraph{}
-	The VFS is the glue that enables system calls such as \texttt{open()}, \texttt{read()}, and \texttt{write()} to work regardless of the filesystem or underlying physical medium\cite{LinuxKernelDevelopment}. VFS provides an interface that is implemented by file system drivers, such as Ext4. The file concept is the base of VFS, because everything is viewed as a file. ProcFS is an example of a pseudo-file system driver, because it uses the VFS to expose a file system-like interface to the user. In instance, a user could query the running processes list either by the traditional \texttt{ps} command or, by making use of VFS, a user could use \texttt{ls} command to list processed in the following manner:
+	The VFS is the glue that enables system calls such as \texttt{open()}, \texttt{read()}, and \texttt{write()} to work regardless of the filesystem or underlying physical medium\cite{LinuxKernelDevelopment}. VFS provides an interface that is implemented by file system drivers, such as Ext4. The file concept is the base of VFS, because everything is viewed as a file. ProcFS is an example of a pseudo-file system driver, because it uses the VFS to expose a file system-like interface to the user. In instance, a user could query the running processes list either by the traditional \texttt{ps} command or, by making use of VFS, a user could use \texttt{ls} command to list processes in the following manner:
 	
 	\paragraph{}
 	\bigskip
@@ -117,7 +119,7 @@
 		\item file object represents an opened file
 	\end{itemize}
 	
-	Each of the aforementioned contains an operations object which are pointers to functions that the kernel invokes against the primary objects.
+	Each of the aforementioned objects contains an operations object which are pointers to functions that the kernel invokes against the primary objects.
 	
 	\paragraph{}
 	The file\_operations structure contains two function pointers that are of interest in the context of implementing a file protector on Linux: \\
@@ -134,9 +136,9 @@
 	
 	The \texttt{open()} callback creates a new file object and links it to the corresponding inode object. It is called by the \texttt{open()} system call\cite{LinuxKernelDevelopment}. This is the most important callback because it allows synchronous interception of file open semantics as well as allowing the possibility to resolve the request inside the filter. A Linux implementation of the file protector would complete the file system request with the \texttt{EPERM} status in order to block access.\\ 
 	
-	The \texttt{release()} callback by the VFS when the last remaining reference to the file is destroyed. For example, when the last process sharing a file descriptor calls \texttt{close()} or exits. Its purpose is file system-dependent\cite{LinuxKernelDevelopment}. This call has no functional utility for the file protector. It is only used to clean up control structures for opened file objects after it goes out of scope. 
+	The \texttt{release()} callback is called by the VFS when the last remaining reference to the file is destroyed. For example, when the last process sharing a file descriptor calls \texttt{close()} or exits. Its purpose is file system-dependent\cite{LinuxKernelDevelopment}. This call has no functional utility for the file protector. It is only used to clean up control structures for opened file objects after it goes out of scope. 
 	
-	\paragraph{} 
+	\paragraph{}
 	User mode communication can be easily achieved leveraging the SysFS pseudo-file system which is mounted at /sys. With the help of \texttt{kobject\_create\_and\_add} a driver can export an object to SysFS. \\
 	
 	\begin{Verbatim}[fontsize=\small, commandchars=\\\{\}]
@@ -156,7 +158,7 @@ struct kobject * kobject_create_and_add (
 	\end{Verbatim}
 	
 	\paragraph{}
-	This mechanism allows us to easily pass messages between user and kernel through the exposed SysFS entry by responding to user mode requests (i.e. open, read, write syscalls). For each filter a directory is created at /sys/fs/redirfs/$<$ filterName$>$ \cite{RedirFS}. The filters' directory contains two important files: active, and paths. The active file specifies if the filter is active or not and the paths file contains a list of included or excluded paths. Callbacks are called only for included paths. This feature could be used in order to minimize performance overhead so that we only monitor protected paths and nothing else. 
+	This mechanism allows us to easily pass messages between user and kernel through the exposed SysFS entry by responding to user mode requests (i.e. open, read, write syscalls). For each filter a directory is created at /sys/fs/redirfs/$<$ filterName$>$ \cite{RedirFS}. The filters' directory contains two important files: "active", and "paths". The "active" file specifies if the filter is active or not and the "paths" file contains a list of included or excluded paths. Callbacks are called only for included paths. This feature could be used in order to minimize performance overhead so that we only monitor protected paths and nothing else. 
 	
 	\paragraph{}
 	As previously mentioned, the only operations that are of interest are file open and release. This means that we will register pre callback for the \texttt{REDIRFS\_REG\_FOP \_OPEN} operation and a post callback for the \texttt{REDIRFS\_REG\_FOP\_RELEASE} operation. 
@@ -176,13 +178,13 @@ static enum redirfs_rv fp_pre_open(redirfs_context context,
 	\paragraph{}
 	The filename along with the process id is sent to user mode and displayed in a message box showing "Allow" and "Deny" buttons. Then the file access is blocked or allowed based on the user's decision
 	
-	In order to block the file we need to set an appropriate status in the \texttt{args->rv.rv\_int} field, such as \texttt{-EPERM}. It is also needed to return \texttt{REDIRFS\_STOP} from the pre callback so that other filters are not called in case the file access is blocked.
+	In order to block the file we need to set an appropriate status in the \texttt{args->rv. rv\_int} field, such as \texttt{-EPERM}. It is also needed to return \texttt{REDIRFS\_STOP} from the pre callback so that other filters are not called in case the file access is blocked.
 	
 	\subsection{System Call Hooking}
 	\paragraph{} 
 	Syscall hooking, also known as system call hooking or as system service dispatch table hooking, is a hooking technique that is based on replacing system call handlers with custom ones in order to intercept, monitor and possibly modify the normal system call flow.
 	
-	The Linux syscall table is named \texttt{sys\_call\_table}. It is an array with function pointers, functions that are known as system call handlers. In order to hook a system call the table should be modified by adding the hook syscall handler instead of the original one. For example, the following sequence would hook the open syscall:
+	The Linux syscall table is named \texttt{sys\_call\_table}. It is an array with function pointers, functions that are named system call handlers. In order to hook a system call, the table should be modified by replaceing the original syscall handler with a hook. For example, the following sequence would hook the open syscall:
 	
 	\begin{Verbatim}[fontsize=\small, commandchars=\\\{\}]
 	sys_call_table[__NR_open] = our_sys_open
@@ -191,23 +193,23 @@ static enum redirfs_rv fp_pre_open(redirfs_context context,
 	This might work on older versions of Linux but on newer versions the system call table resides in read-only memory. Trying to write over read-only memory would cause an exception that would crash the system. Therefore, in order to properly hook on every Linux version the system call table memory region should be changed to be read-write while the hook is placed and changed back to read after the hook was installed. 
 	
 	\paragraph{}
-	From this point on, the solution is more or less equivalent to the Windows version. We match the file name against a list of protected files, notify the user mode application and prompt the user for allowing or denying access. If the file does not mach any of the protected files, the original system call handler will be called in order to allow the operating system to normally resolve the open request.
+	From this point on, the solution is more or less equivalent to the Windows version, which will be described in detail later on. Basically, we match the file name against a list of protected files, notify the user mode application and prompt the user for allowing or denying access. If the file does not mach any of the protected files, the original system call handler will be called in order to allow the operating system to normally resolve the open request.
 	
 	\paragraph{}
 	Even though this technique may seem generic enough as a concept because every modern operating system will use a syscall table in order to service user mode operation requests, it wouldn't work on Windows because of a component known as the Patch Guard. The Patch Guard is a Windows component that does runtime checks on critical structures, checks the integrity of functions. This means that any modification to the system call table or any binary modification on system call handler code would trigger Patch Guard, ultimately causing a BSOD (Blue Screen of Death).
 
 	\paragraph{}
-	We can conclude that a VFS based approach would be more elegant since syscall hooking is a very intrusive technique.
+	We can conclude that a VFS based approach would be more elegant since syscall hooking is a more intrusive technique.
 	
 	\newpage
 	\section{Malware}
 	Malware is a general term for all types of malicious software, which in the context of
 	computer security means: Software which is used with the aim of attempting to breach a computer system’s security policy with respect to Confidentiality, Integrity or Availability\cite{AnIntroductionToMalware}.
 	
-	They can be spread by e-mail, sharing media, sharing documents and programs, or downloading things fro the Internet, or they can be purposely inserted by an attacker\cite{CISSP}.
+	They can be spread by e-mail, sharing media, sharing documents and programs, or downloading things from the Internet, or they can be purposely inserted by an attacker\cite{CISSP}.
 	
 	\paragraph{}
-	There are multiple classifications and for describing malware. Some common malware types are:
+	There are multiple classifications for describing malware. Some common malware types are:
 	\begin{itemize}
 		\item virus
 		\item worm
@@ -220,13 +222,12 @@ static enum redirfs_rv fp_pre_open(redirfs_context context,
 
 	This paper is particularly interested in ransomware and in data exfiltators. A ransomware is a type of malware which encrypts the target’s entire disk or the content of selected files and demands money from the user to get them decrypted again\cite{AnIntroductionToMalware}. Data exfiltrators are malicious programs that steal data. 
 	
-	The common
-behavior for both of these types of malware is that they try to access files for personal gain (i.e. money, information). 
+	The common behavior for both of these types of malware is that they try to access files for personal gain (i.e. money, information). 
 	
 	\paragraph{}
 	The File Protector solution presented in this paper aims to protect the confidentiality, integrity and availability of files that are of critical importance to the user. If a ransomware would try to encrypt a protected file, the user would be notified of this action, letting him know of the process that is doing the action and the file which is being accessed. The user has to make a conscious decision of allowing or denying access to that specific process. 
 	
-	This is in no way an antivirus solution or does not try to replace one. It is simply another layer of defense in the phase of malicious programs trying to access critical data stored as files. Therefore it is strongly recommended that this solution is run alongside an antivirus solution as it would not defend against other types of attacks (i.e. worms, exploits, botnets).
+	This is in no way an antivirus solution nor does not try to replace one. It is simply another layer of defense in the face of malicious programs trying to access critical data stored as files. Therefore it is strongly recommended that this solution is run alongside an antivirus solution as it would not defend against other types of attacks (i.e. worms, exploits, botnets).
 	
 	
 	
@@ -236,7 +237,7 @@ behavior for both of these types of malware is that they try to access files for
 	
 		\subsection{Windows Drivers}
 		\paragraph{}
-		A Windows Driver is a software component which usually makes the communication between the operating system and devices possible. Not all the drivers need to communicate directly with a device. For example, an I/O request can be passed through multiple drivers overlaid in a stack, like in figure \ref{fig:drivers}. These drivers can complete, modify or pass along the request to the drivers below until the request is completed by one of the drivers. After a request is fulfilled a completion notification could be sent to interested drivers\cite{MSDNWhatIsADriver}.
+		A Windows Driver is a software component which usually makes the communication between the operating system and devices possible. Not all the drivers need to communicate directly with a device. For example, an I/O request can be passed through multiple drivers overlaid in a stack, like in figure \ref{fig:drivers}. These drivers can complete, modify or pass along the request to the drivers below until the request is completed by one of the drivers. After a request is fulfilled a completion notification is sent to interested drivers\cite{MSDNWhatIsADriver}.
 		
 		
 		\begin{figure}[h!]
@@ -247,14 +248,14 @@ behavior for both of these types of malware is that they try to access files for
 			\end{center}
 		\end{figure}
 		\paragraph{}
-		I/O requests are sent to device drivers packaged in IRPs (I/O request packets). An IRP is a structure containing request's information. An important role pays the following field from the IRP structure\cite{MSDNIORequests}:
+		I/O requests are sent to device drivers packaged in IRPs (I/O request packets). An IRP is a structure containing request's information. An important role is played by the following field from the IRP structure\cite{MSDNIORequests}:
 		\bigskip
 		
 			\centerline{\textcolor{blue}{struct} \textcolor{cyan}{\texttt{\_IO\_STACK\_LOCATION}} *\textcolor{cyan}{CurrentStackLocation}}
 		
 		\bigskip	
 		\paragraph{}
-		The Windows I/O system consists of several executive components that together manage hardware devices and provide interfaces to hardware devices for applications and the system\cite{WindowsInternals}. It is a packet driven system, with requests being usually backed by structures named IRPs. It is also possible that these requests to bypass the IRP-driven mechanism and go straight to the driver to complete the I/O request. This mechanism is called "Fast I/O".
+		The Windows I/O system consists of several executive components that together manage hardware devices and provide interfaces to hardware devices for applications and the system\cite{WindowsInternals}. It is a packet driven system, with requests being usually backed by structures named IRPs. It is also possible for these requests to bypass the IRP-driven mechanism and go straight to the driver to complete the I/O request. This mechanism is called "Fast I/O".
 		
 		The I/O manager is responsible with IRP lifecycle management and also with passing them to the correct device stack in order to be properly processed. This places the I/O manager at the core of the I/O system. 
 		
@@ -275,7 +276,7 @@ behavior for both of these types of malware is that they try to access files for
 
 		The common I/O processing path can be seen in image \ref{fig:IORequest}.
 
-		Firstly, the application issues a system call to the operating system. Then, once it reaches the kernel, an IRP is allocated and sent to the corresponding driver. The driver can resolve the request by sending one or multiple I/O requests towards a physical device. It can also resolve the request without the help of any physical hardware support by considering the request to be for a virtual resource (i.e. filter port, pipe).
+		Firstly, the application issues a system call to the operating system. Then, once it reaches the kernel, an IRP is allocated and sent to the corresponding driver. The driver can resolve the request by sending one or multiple I/O requests towards a physical device or to other device stacks. It could also resolve the request without the help of any physical hardware support by considering the request to be for a virtual resource (i.e. filter port, pipe).
 		
 		
 		\paragraph{}
@@ -304,7 +305,7 @@ behavior for both of these types of malware is that they try to access files for
 	   	In order to get information regarding the I/O performed operation in a  driver \textcolor{blue}{IoGetCurrentIrpStackLocation} has to be called . After the desired operations have been performed in the current high-level driver, the developer   must set up the I/O stack location for the next driver\cite{MSDNIOStackLocations}.
 	   
 	   	\paragraph{}
-	   	In terms of ways to organize a driver, there are multiple driver models such as Legacy Model, WDM (Windows Driver Model) or WDF (Windows Driver Foundation). The models consist of a set of API's that ease the development process. Depending on what type of driver a developer wants to implement a model can be chosen. In general, drivers can be of the following types: bus drivers, function drivers and filter drivers. 
+	   	In terms of ways to organize a driver, there are multiple driver models such as Legacy Model, WDM (Windows Driver Model) or WDF (Windows Driver Foundation). The models consist of a set of API's that ease the development process. Depending on what type of driver a developer wants to implement a model can be chosen. In general, drivers can be of the following types: bus drivers, function drivers and filter drivers.
 	   	
 	   	\paragraph{}
 	   	A bus driver is responsible with individual I/O bus devices. Bus drivers are required and there usually exist bus drivers for every type of bus on the machine. This type of driver can also report child devices connected to the bus. Microsoft and OEMs usually offers a set of common bus drivers such as USB, PCI and many others\cite{MSDNWDMDrivers}.
@@ -319,7 +320,7 @@ behavior for both of these types of malware is that they try to access files for
 	   	For a better understanding of filter drivers an example would be a driver that encrypts the disk data. It's functionality is to encrypt everything that goes to the disk and also decrypt the content requested from upper drivers. Therefore, the said filter driver could be an upper filter for the disk driver.
 	   
 	   	\paragraph{}
-	   	From this example we can easily see that the way drivers are structured is in compliance with the first two SOLID principles. The single responsibility principle is backed up by the fact that every driver should handle one particular functionality that is easy to maintain with respect to other drivers. Also, the open-closed principle is followed because if Microsoft or a third party driver vendor wants to have a new functionality it can be written as a new filter driver to extend the functionality the old ones were offering. This way the old functionality is still provided, and the new ones can work independently without modifying the old components.
+	   	From this example we can easily see that the way drivers are structured is in compliance with the first two SOLID principles. The single responsibility principle is backed up by the fact that every driver should handle one particular high-level functionality that is easy to maintain with respect to other drivers. Also, the open-closed principle is followed because if Microsoft or a third party driver vendor wants to have a new functionality it can be written as a new filter driver to extend the functionality the old ones were offering. This way the old functionality is still provided, and the new ones can work independently without modifying the old components.
 	   
 	   	\paragraph{}
 	   	Figure \ref{fig:driverstack} displays a driver stack containing basic drivers in a stack. The bus driver is at the bottom of the stack because it is closest to hardware. Filter drivers, which are optional, add functionality to the bus an function drivers. And finally, the function driver is the one which provides the operational interface for the device.
@@ -335,16 +336,16 @@ behavior for both of these types of malware is that they try to access files for
 	   
 		\subsection{Windows Filter Manager}
 		\paragraph{}
-		During the years, a lot of problem with legacy filter drivers were starting to push the developer community to find solution to ease filters development. One great inconvenience is the fact that all IRP operation must be processed thus being a hard process. Due this and many other reasons, Microsoft decided to come with a solution regarding file system filters, which has been the development of Windows Filter Manager Driver. Nowadays files system filters are not supported anymore on newest Windows versions.
+		During the years, a lot of problem with legacy filter drivers started to push the developer community to find solution to ease filters development, particularly file system filters. One great inconvenience is the fact that all IRP operation must be processed thus being a hard process. Due this and many other reasons, Microsoft decided to come with a solution regarding file system filters, which has been the development of Windows Filter Manager Driver. Nowadays legacy files system filters are not supported anymore on newest Windows versions. 
 		
 		\paragraph{}
-		Filter Manager is a Windows driver containing functionality commonly required by drivers that intend to filter the file system. This set of functionalities is installed by default on Windows, but it only becomes active when a minifilter driver is loaded\cite{MSDNFltMgrConcepts}. Some of the features from Filter Manager are loading/unloading a minifilter any time, having more control over where the minifilter is loaded in terms of altitude and also volume it attaches to and the most important feature being the possibility to filter IRPs by registering callbacks that are called before the operation is started (Pre callbacks) and after the operation is completed (Post callbacks). 
+		The Filter Manager is a Windows driver containing functionality commonly required by drivers that intend to filter the file system. This set of functionalities is present by default on Windows, but it only becomes active when a minifilter driver is loaded\cite{MSDNFltMgrConcepts}. Some of the features from Filter Manager are loading/unloading a minifilter any time, having more control over where the minifilter is loaded in terms of altitude and also volume it attaches to and the most important feature being the possibility to filter IRPs by registering callbacks that are called before the operation is started (Pre callbacks) and after the operation is completed (Post callbacks). 
 		
 		\paragraph{}	
 		Pre callbacks can be used to provide additional functionality to the file system stack, allowing developers to complete the IRP themselves. Post callbacks are useful when a decision must be made based on the IRP completion information (i.e. status). Both pre and post callbacks have two important input parameters: \\ a PFLT\_CALLBACK\_DATA structure and a PCFLT\_RELATED\_OBJECTS structure. The first one is a view over the IRP that is presented to the minifilter driver. The second one is a structure that contains pointers to the objects that are related to the operation being processed (i.e. Volume, FileObject).
 		
 		\paragraph{}
-		The altitude is a unique string identifier, interpreted as a number, which represents the position where a minifilter driver is loaded relative to other minifilters. The allocation of altitudes is managed by Microsoft thus the developers having to request an altitude in order to launch their driver into the market\cite{MSDNFltMgrConcepts}.
+		An important issue that was solved by the Filter Manager was filter load order. This is where altitude comes in, which is a unique string identifier, interpreted as a number, that represents the position where a minifilter driver is loaded relative to other minifilters. The allocation of altitudes is managed by Microsoft thus the developers have to request an altitude in order to release their driver to market\cite{MSDNFltMgrConcepts}.
 		
 		\paragraph{}
 		In minifilters, and not only, there are a set of load order groups for file system filters, which are loaded at system startup. These load order groups represent the order in which drivers will be loaded in memory\cite{MSDNFltMgrConcepts}. Load order groups are common for legacy filter drivers and minifilters, but the difference is that minifilters have the altitude therefore having an exact order in which the drivers will be loaded in spite of legacy filter drivers where filters having the same load order group will be loaded in memory in a random order.
@@ -371,11 +372,11 @@ behavior for both of these types of malware is that they try to access files for
 	
 		\subsection{High Level Overview of Design}
 		\paragraph{}
-		Designed application is layered in 3 main components (fig.\ref{fig:FPMAinComponents}):
+		The designed application is layered in 3 main components (fig.\ref{fig:FPMAinComponents}):
 		\begin{itemize}
 			\item fpf.sys
 			\item FileProtectorCore.dll
-			\item FileProtectorUI.exe
+			\item File Protector.exe
 		\end{itemize}
 		
 		\paragraph{}
@@ -457,12 +458,12 @@ behavior for both of these types of malware is that they try to access files for
 			\end{center}
 		\end{figure}
 	
-		It can be seen how the filename is truncated and appended a tilde and an index (i.e. SHORTP~1\ref{fig:ShortPaths}). In order to obtain the "real" NT path, we need to normalize the path by using the flag previously described.
+		It can be seen how the filename is truncated and appended a tilde and an index (i.e. SHORTP\textasciitilde1 fig \ref{fig:ShortPaths}). In order to obtain the "real" NT path, we need to normalize the path by using the flag previously described.
 		
 		\textcolor{magenta}{FLT\_FILE\_NAME\_QUERY\_ALWAYS\_ALLOW\_CACHE\_LOOKUP} first checks filter manager cache if name is already resolved. In case it is not, it queries the file system for the file name, by opening the file, if it is currently safe to do so.
 		
 		\paragraph{}
-		After the path has been solved, a notification is sent into the dll using FltSendMessage. The communication needs a \textcolor{Emerald}{PFLT\_PORT} which needs to be created with FltCreateCommunicationPort in the minifilter and opened with FilterConnectCommunicationPort in the dll. Then the message is retrieved and a toast notification is displayed. \ref{fig:ToastNotification}
+		After the path has been solved, a notification is sent into the dll using FltSendMessage. The communication needs a \textcolor{Emerald}{PFLT\_PORT} which needs to be created with \texttt{FltCreateCommunicationPort} in the minifilter and opened with \texttt{FilterConnect CommunicationPort} in the dll. Then the message is retrieved and a toast notification is displayed (fig \ref{fig:ToastNotification}).
 		
 		\begin{figure}[h!]
 			\begin{center}
@@ -473,12 +474,12 @@ behavior for both of these types of malware is that they try to access files for
 		\end{figure}
 	
 		\paragraph{}
-		In case the "More" button is pressed, a secure desktop will be opened displaying the full path and the process trying to open the file. The secure desktop is necessary because we need to create a window that cannot get messages from any other process. By creating a new desktop specifically for our window, other processes will not be able to send messages (i.e. SendMessage, PostMessage) to our window because they will not have a handle for it. For a new desktop to be created, the following functions needed to be imported from user32.dll and kernel32.dll: GetThreadDesktop, GetCurrentThreadId, CreateDesktop, SwitchDesktop, SetThreadDesktop and CloseDesktop. 
+		In case the "More" button is pressed, a secure desktop will be opened displaying the full path and the process trying to open the file. The secure desktop is necessary because we need to create a window that cannot get messages from any other process. By creating a new desktop specifically for our window, other processes will not be able to send messages (i.e. SendMessage, PostMessage) to our window because they will not have a handle for it. For a new desktop to be created, the following functions needed to be imported from user32.dll and kernel32.dll: \texttt{GetThreadDesktop}, \texttt{GetCurrentThreadId}, \texttt{CreateDesktop}, \texttt{SwitchDesktop}, \texttt{SetThreadDesktop} and\\ \texttt{CloseDesktop}. 
 		
 		\paragraph{}
-		Firstly, the old desktop should be preserved for recall and that was done by calling GetThreadDesktop(GetCurrentThreadId()) and keeping the returned value into a variable. To create the desktop and make it visible the calls should be performed in this order: CreateDesktop, SwitchDesktop. After the user made a choice, the old desktop must be restored to the initial state preforming the following calls: SwitchDesktop, SetThreadDesktop, CloseDesktop. 
+		Firstly, the old desktop should be preserved for recall and that was done by calling \texttt{GetThreadDesktop(GetCurrentThreadId())} and keeping the returned value into a variable. To create the desktop and make it visible the calls should be performed in this order: \texttt{CreateDesktop}, \texttt{SwitchDesktop}. After the user made a choice, the old desktop must be restored to the initial state preforming the following calls: \texttt{SwitchDesktop}, \texttt{SetThreadDesktop}, \texttt{CloseDesktop}. 
 		
-		After the user denies the file opening, user's option is sent to the dll which sends it further to the minifilter by calling FilterSendMessage. The driver will block the file depending on users' response. 
+		After the user denies the file opening, user's option is sent to the dll which sends it further to the minifilter by calling \texttt{FilterSendMessage}. The driver will block the file depending on users' response. 
 	
 	
 		\subsection{Inter Component Communication}
@@ -492,13 +493,13 @@ behavior for both of these types of malware is that they try to access files for
 		\paragraph{}
 		Communication between user mode and kernel mode is supported by the Filter Manager. The minifilter driver can create a communication port which will begin to listen for incoming connections by default. 
 		
-		Port's security is handled in the minifilter driver by specifying a security descriptor. Among  Windows APIs we can find a variety of functions regarding creating and initializing a security descriptor for a new object from which I used FltBuildDefaultSecurityDescriptor. This function builds a security descriptor that can be further applied to a communication port which means only users with system administrator privileges will have access to the port\cite{MSDNCommunication}.
+		Port's security is handled in the minifilter driver by specifying a security descriptor. Among  Windows APIs we can find a variety of functions regarding creating and initializing a security descriptor for a new object from which I used \texttt{FltBuildDefaultSecurityDescriptor}. This function builds a security descriptor that can be further applied to a communication port which means only users with system administrator privileges will have access to the port\cite{MSDNCommunication}.
 		
 		\paragraph{}
-		FltCreateCommunicationPort demands 3 callbacks used for communication between kernel mode and user mode: one that will be called when a client connects on the port, one that is called when a client disconnects, and one which is called when user mode applications call FilterSendMessage to send a message to the minifilter driver through the port\cite{MSDNCommunication}.
+		\texttt{FltCreateCommunicationPort} demands 3 callbacks used for communication between kernel mode and user mode: one that will be called when a client connects on the port, one that is called when a client disconnects, and one which is called when user mode applications call FilterSendMessage to send a message to the minifilter driver through the port\cite{MSDNCommunication}.
 		
 
-		For a client to connect on the filer port, FilterConnectCommunicationPort must be used. After the call has succeeded, FilterSendMessage can be used to communicate from user mode to kernel mode and FilterGetMessage is used to wait for messages sent from kernel mode to user mode\cite{MSDNCommunication}.
+		For a client to connect on the filer port, \texttt{FilterConnectCommunicationPort} must be used. After the call has succeeded, \texttt{FilterSendMessage} can be used to communicate from user mode to kernel mode and \texttt{FilterGetMessage} is used to wait for messages sent from kernel mode to user mode\cite{MSDNCommunication}.
 		
 		
 		\paragraph{}
@@ -516,14 +517,14 @@ behavior for both of these types of malware is that they try to access files for
 		
 		WinObj is a Windows Sysinternals tool that uses Windows APIs to access and display information about namespaces. If we go to the GLOBAL?? namespace in WinObj, we can see that C: and D: have as symbolic links $\backslash$Device$\backslash$ HarddiskVolume4 and $\backslash$Device$\backslash$HarddiskVolume5, as highlighted in figure figure \ref{fig:WinObj} .
 		
-		When paths are sent from user mode to kernel mode, they must be converted to NT paths by resolving the drive letter symbolic link by calling the ZwQuerySymbolicLinkObject API.
+		When paths are sent from user mode to kernel mode, they must be converted to NT paths by resolving the drive letter symbolic link by calling the \texttt{ZwQuerySymbolicLinkObject} API.
 		
 		\subsection{Encountered Challenges}
 		\paragraph{}
 		 A minifilter driver development process is different from what most of programmers are used to because it requires a lot of attention and especially knowledge of Windows drivers in order to get a satisfying end result.
 		
 		\paragraph{}
-		One of the first challenges I want to talk about is testing. Windows drivers must be tested on a test machine, because any little mistake could lead to compromising system's availability. In order to test my code I've created a Windows 10 Pro x64 virtual machine. For drivers to be loaded, Windows requests drivers to be signed with a Microsoft certificate. However, for testing purposes the drivers can be signed with a test certificate and thus Windows does not load test-signed drivers. 
+		One of the first challenges I want to talk about is testing. Windows drivers must be tested on a dedicated test machine, because any little mistake could lead to compromising system's stability. In order to test my code I've created a Windows 10 Pro x64 virtual machine. For drivers to be loaded, Windows requests drivers to be signed with a Microsoft certificate. However, for testing purposes the drivers can be signed with a test certificate and thus Windows does not load test-signed drivers. 
 		
 		\paragraph{}
 		In order to load a driver with a test signature the machine has to be set to test mode which is done through following commandline (it must be opened with administrator rights):
@@ -536,14 +537,19 @@ behavior for both of these types of malware is that they try to access files for
 		The result can be seen almost immediately because a watermark will be shown on the lower right side of the screen and the driver with test signature can be loaded.
 		
 		\paragraph{}
-		Another challenge was debugging the driver. Because every bug would lead to a BSOD, debugging is a good solution when it comes to testing newly added code. Similar to setting the machine as a test one, kernel debugging should be enabled with the command:
+		Another challenge was debugging the driver. Because every bug would lead to a BSOD, debugging is a good solution when it comes to testing newly added code. Similar to setting the machine as a test one, kernel debugging should be enabled with the commands:
 		
 		\bigskip
-		\centerline {\texttt{bcdedit -set debug on}}
+		\begin{Verbatim}
+	bcdedit -set debug on
+	bcdedit /dbgsettings NET hostip:192.168.100.2 PORT:50000
+		\end{Verbatim}
 		\bigskip
+		
+		These commands will enable debug mode on the machine, and will also make the machine communicate with a remote debugger that's present in the same network, on a machine with IP 192.168.100.2 and on port 50000. This eases the debugging because every time an assertion or crash occurs, the machine will trigger the debugger and halt, allowing an easy inspection o the machine's state.
 		
 		\paragraph{}
-		 When it comes to creating a new desktop, WPF does not support creating windows in the newly created desktop. A solution for this issue was creating a Windows Forms Window instead of a WPF one, and it will be displayed correctly.
+		 When it comes to creating a new desktop, WPF does not support creating windows in the newly created desktop. A solution for this issue was creating a Windows Forms Window instead of a WPF one, which is properly rendered by the operating system.
 		
 	\newpage
 	\section{Testing Approach}
@@ -575,7 +581,7 @@ behavior for both of these types of malware is that they try to access files for
 			\item special pool - for detecting memory corruptions
 			\item pool tracking - checks for memory leaks
 			\item security checks - monitors common mistakes that result in security issues
-			\item systematic low resource simulation - inserts artificial API failures in order to verify that the driver treats fail cases accordingly
+			\item systematic low resource simulation - inserts artificial API call failures in order to verify that the driver treats fail cases accordingly 
 		\end{itemize}
 		
 		\subsection{Static Code Analysis}
@@ -588,7 +594,7 @@ behavior for both of these types of malware is that they try to access files for
 		\paragraph{}
 		As for behavior, a simple example is \textcolor{magenta}{\texttt{\_Check\_return\_}}. If this annotation is used, the caller must inspect the returned value. In case the function has a void return type, an error will be shown at compilation time. A similar example is \textcolor{magenta}{\texttt{\_Must\_inspect\_result\_}}, which contains the functionality of \textcolor{magenta}{\texttt{\_Check\_return\_}} and adds that any output parameter should also be used after the function call.
 		
-		The following example is the MessageNotifyCallback that is called whenever a user calls FilterSendMessage to send a message to the driver. 
+		The following example is the MessageNotifyCallback that is called whenever a user calls \texttt{FilterSendMessage} to send a message to the driver. 
 		
 		\begin{Verbatim}[fontsize=\small, commandchars=\\\{\}]
 \textcolor{Emerald}{NTSTATUS}
