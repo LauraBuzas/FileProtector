@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Win32;
+using System.Collections.ObjectModel;
 
 namespace FileProtectorUI
 {
@@ -13,10 +9,6 @@ namespace FileProtectorUI
     {
         public static ObservableCollection<FileDTO> files = new ObservableCollection<FileDTO>();
         private const string registryPath = "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\fpf";
-        //public ProtectedFiles()
-        //{
-        //    files = new List<FileDTO>();
-        //}
 
         public static ObservableCollection<FileDTO> GetProtectedFilesFromRegistryKey()
         {

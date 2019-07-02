@@ -17,6 +17,7 @@ using System.Collections.ObjectModel;
 using LiveCharts;
 using LiveCharts.Configurations;
 using LiveCharts.Wpf;
+using Microsoft.Win32;
 
 namespace FileProtectorUI
 {
@@ -111,6 +112,9 @@ namespace FileProtectorUI
         private FileProtectorContext fp;
         public string[] Labels { get; set; }
         public SeriesCollection Series;
+        public bool isMonitoringActive = true;
+        public bool isDefaultBlockingActive = true;
+        public bool isInitState = true;
 
         public MainWindow()
         {
@@ -119,6 +123,13 @@ namespace FileProtectorUI
             InitializeComponent();
             PopulateFilesList();
 
+            isMonitoringActive = readFromRegistry("isMonitoring");
+            ComboMonitoring.SelectedIndex =  isMonitoringActive ? 0 : 1;
+            isDefaultBlockingActive = readFromRegistry("isDefaultBlocking");
+            ComboBlock.SelectedIndex = isDefaultBlockingActive ? 0 : 1;
+            showIcons();
+            isInitState = false;
+           
             fp = new FileProtectorContext();
             PopulateHistoryList();
             syncCtx = SynchronizationContext.Current;
@@ -126,6 +137,49 @@ namespace FileProtectorUI
             worker.SetApartmentState(ApartmentState.STA);
             //worker.Start();
             InitializeLabels();
+
+        }
+
+        private void showIcons()
+        {
+            if(isMonitoringActive)
+            {
+                TextBlockMonitoringRed.Visibility = Visibility.Hidden;
+                TextBlockMonitoringGreen.Visibility = Visibility.Visible;
+            } else
+            {
+                TextBlockMonitoringRed.Visibility = Visibility.Visible;
+                TextBlockMonitoringGreen.Visibility = Visibility.Hidden;
+            }
+
+            if(isDefaultBlockingActive)
+            {
+                TextBlockBlockGreen.Visibility = Visibility.Visible;
+                TextBlockBlockRed.Visibility = Visibility.Hidden;
+            } else
+            {
+                TextBlockBlockGreen.Visibility = Visibility.Hidden;
+                TextBlockBlockRed.Visibility = Visibility.Visible;
+            }
+        }
+
+        private bool readFromRegistry(String key)
+        {
+            string registryPath = "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\fpf";
+            String registryKeyValue = (String)Registry.GetValue(registryPath, key, "");
+            if (registryKeyValue == "True")
+            {
+                return true;
+            }
+            else if (registryKeyValue == "False")
+            {
+                return false;
+            }
+            else
+            {
+                Registry.SetValue(registryPath, key, false.ToString());
+                return false;
+            }
         }
 
         private void InitializeLabels()
@@ -157,17 +211,37 @@ namespace FileProtectorUI
                 ulong pid = 0;
                 UInt64 messageId;
                 IntPtr ptr;
-                GetNextNotification(out ptr, out pid, out messageId);
-                if (ptr == IntPtr.Zero)
+                if (isMonitoringActive)
                 {
-                    continue;
+                    GetNextNotification(out ptr, out pid, out messageId);
+                    if (ptr == IntPtr.Zero)
+                    {
+                        continue;
+                    }
+                    path = System.Runtime.InteropServices.Marshal.PtrToStringUni(ptr);
+                    bool allow = false;
+                    if (isDefaultBlockingActive)
+                    {
+                        allow = false;
+                    }
+                    else
+                    {
+                        allow = ShowToastNotification(path, pid);
+                    }
+                    BlockAccess(messageId, !allow);
+                    FreeNotification(ptr);
                 }
-                path = System.Runtime.InteropServices.Marshal.PtrToStringUni(ptr);
-                bool allow = false;
-                allow = ShowToastNotification(path, pid);
-
-                BlockAccess(messageId, !allow);
-                FreeNotification(ptr);
+                else
+                {
+                    GetNextNotification(out ptr, out pid, out messageId);
+                    if (ptr == IntPtr.Zero)
+                    {
+                        continue;
+                    }
+                    bool allow = true;
+                    BlockAccess(messageId, !allow);
+                    FreeNotification(ptr);
+                }
             }
         }
 
@@ -256,14 +330,15 @@ namespace FileProtectorUI
                     case "Deny":
                         break;
                     case "More":
-                        allowed = InputPasswordMessageBoxLaunch(path, pid); 
+                        allowed = InputPasswordMessageBoxLaunch(path, pid);
                         break;
-                default:
+                    default:
                         break;
-            }
+                }
                 evt.Set();
             };
-            toast.Failed += (notification, args) => {
+            toast.Failed += (notification, args) =>
+            {
                 allowed = false;
                 evt.Set();
             };
@@ -276,7 +351,7 @@ namespace FileProtectorUI
             t.Show(toast);
             evt.WaitOne();
 
-            App.Current.Dispatcher.Invoke((Action)delegate 
+            App.Current.Dispatcher.Invoke((Action)delegate
             {
                 fp.Add(new HistoryEntry
                 {
@@ -301,14 +376,16 @@ namespace FileProtectorUI
             SwitchDesktop(pNewDesktop);
 
             bool allow = false;
-            Thread t = new Thread(() => { 
+            Thread t = new Thread(() =>
+            {
                 SetThreadDesktop(pNewDesktop);
 
                 Form loginWnd = new Form();
                 loginWnd.AutoSize = true;
                 Button allowButton = new Button();
                 allowButton.Text = "Allow";
-                allowButton.Click += (e, args) => {
+                allowButton.Click += (e, args) =>
+                {
                     allow = true;
                     loginWnd.Close();
                 };
@@ -382,6 +459,48 @@ namespace FileProtectorUI
                 fp.Remove(entry);
             }
             fp.SaveChanges();
+        }
+
+        private void MonitoringSelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            if (!isInitState)
+            {
+                string registryPath = "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\fpf";
+                if (ComboMonitoring.Text.Equals("Active"))
+                {
+                    isMonitoringActive = false;
+                    TextBlockMonitoringRed.Visibility = Visibility.Visible;
+                    TextBlockMonitoringGreen.Visibility = Visibility.Hidden;
+                }
+                else
+                {
+                    isMonitoringActive = true;
+                    TextBlockMonitoringRed.Visibility = Visibility.Hidden;
+                    TextBlockMonitoringGreen.Visibility = Visibility.Visible;
+                }
+                Registry.SetValue(registryPath, "isMonitoring", isMonitoringActive.ToString());
+            }
+        }
+
+        private void BlockingSelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            if (!isInitState)
+            {
+                string registryPath = "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\fpf";
+                if (ComboBlock.Text.Equals("Yes"))
+                {
+                    isDefaultBlockingActive = false;
+                    TextBlockBlockGreen.Visibility = Visibility.Hidden;
+                    TextBlockBlockRed.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    isDefaultBlockingActive = true;
+                    TextBlockBlockGreen.Visibility = Visibility.Visible;
+                    TextBlockBlockRed.Visibility = Visibility.Hidden;
+                }
+                Registry.SetValue(registryPath, "isDefaultBlocking", isDefaultBlockingActive.ToString());
+            }
         }
     }
 }

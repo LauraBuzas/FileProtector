@@ -63,15 +63,15 @@
                             <Button Margin="0,0,15,15" Height="30" Width="200" HorizontalAlignment="Right" Click="BrowseButtonClick">Browse</Button>
                         </StackPanel>
                         <ListBox Name="filesList" Margin="20" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <StackPanel MouseUp="StackPanel_MouseUp">
-                                            <TextBlock Foreground="{StaticResource Foreground}" FontSize="30" Text="{Binding Name}"/>
-                                            <TextBlock Foreground="{StaticResource Foreground}" FontSize="16" Text="{Binding Path}"/>
-                                            <TextBlock Foreground="{StaticResource Foreground}" FontSize="16" Text="{Binding DateAdded}"/>
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel MouseUp="StackPanel_MouseUp">
+                                        <TextBlock Foreground="{StaticResource Foreground}" FontSize="30" Text="{Binding Name}"/>
+                                        <TextBlock Foreground="{StaticResource Foreground}" FontSize="16" Text="{Binding Path}"/>
+                                        <TextBlock Foreground="{StaticResource Foreground}" FontSize="16" Text="{Binding DateAdded}"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
                         </ListBox>
                     </DockPanel>
                 </TabItem>
@@ -129,7 +129,57 @@
                 </TabItem>
                 <TabItem Header="Settings">
                     <TabItem.Content>
-                        <Grid></Grid>
+                        <Grid Margin="50">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="40"/>
+                                <RowDefinition Height="15"/>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="15"/>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="10"/>
+                                <RowDefinition Height="15"/>
+                                <RowDefinition Height="10"/>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="15"/>
+                                <RowDefinition Height="30"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock FontSize="30" Grid.Row="0" Foreground="{StaticResource Foreground}" Grid.ColumnSpan="3">Overall status</TextBlock>
+
+                            <TextBlock FontSize="16" Grid.Row="2" Foreground="{StaticResource Foreground}">Blocking all files</TextBlock>
+                            <TextBlock Name="TextBlockBlockGreen"  Grid.Row="2" Grid.Column="1" Foreground="Green"  FontFamily="Segoe MDL2 Assets" FontSize="20" Text="&#xE8FB;" HorizontalAlignment="Right"/>
+                            <TextBlock Name="TextBlockBlockRed" Grid.Row="2" Grid.Column="1" Foreground="Red"  FontFamily="Segoe MDL2 Assets" FontSize="20" Text="&#xE783;" HorizontalAlignment="Right"/>
+
+
+                            <TextBlock FontSize="16" Grid.Row="4" Foreground="{StaticResource Foreground}">Monitoring protected files</TextBlock>
+                            <TextBlock Name="TextBlockMonitoringGreen" Grid.Row="4" Grid.Column="1" Foreground="Green"  FontFamily="Segoe MDL2 Assets" FontSize="20" Text="&#xE8FB;" HorizontalAlignment="Right"/>
+                            <TextBlock Name="TextBlockMonitoringRed" Grid.Row="4" Grid.Column="1" Foreground="Red"  FontFamily="Segoe MDL2 Assets" FontSize="20" Text="&#xE783;" HorizontalAlignment="Right"/>
+                            
+                            <Separator Grid.Row="6" Grid.ColumnSpan="2" Margin="5"/>
+                            <TextBlock VerticalAlignment="Center" FontSize="16" Grid.Row="8" Foreground="{StaticResource Foreground}">Block all files automatically</TextBlock>
+                            <ComboBox Name="ComboBlock" VerticalAlignment="Center" Height="30" FontSize="16" Grid.Row="8" Grid.Column="1" Width="100" HorizontalAlignment="Right" SelectionChanged="BlockingSelectionChanged">
+                                <ComboBoxItem>
+                                    Yes
+                                </ComboBoxItem>
+                                <ComboBoxItem>
+                                    No
+                                </ComboBoxItem>
+                            </ComboBox>
+                            <TextBlock VerticalAlignment="Center" FontSize="16" Grid.Row="10" Foreground="{StaticResource Foreground}">Monitoring</TextBlock>
+                            <ComboBox Name="ComboMonitoring" Height="30" FontSize="16" Grid.Row="10" Grid.Column="1" SelectedIndex="0" Width="100" HorizontalAlignment="Right" SelectionChanged="MonitoringSelectionChanged">
+                                <ComboBoxItem>
+                                    Active
+                                </ComboBoxItem>
+                                <ComboBoxItem>
+                                    Not Active
+                                </ComboBoxItem>
+                            </ComboBox>
+                        </Grid>
                     </TabItem.Content>
                 </TabItem>
                 <TabItem Header="Help">
