@@ -41,14 +41,14 @@ DllMain(
     {
     case DLL_PROCESS_ATTACH:
 		DisableThreadLibraryCalls(Module);
-		//Init();
+		Init();
 		break;
     case DLL_THREAD_ATTACH:
 		break;
     case DLL_THREAD_DETACH:
 		break;
     case DLL_PROCESS_DETACH:
-		//Uninit();
+		Uninit();
         break;
     }
     return TRUE;
@@ -91,27 +91,6 @@ CopyMemory(buffer, path, length * sizeof(wchar_t));
 */
 extern "C"
 {
-
-
-	__declspec(dllexport)
-		int
-		function()
-	{
-		return 1;
-	}
-
-	__declspec(dllexport)
-		char*
-		function2()
-	{
-		char *str = (char *)malloc(sizeof(char) * 3);
-		str[0] = 'm';
-		str[1] = 'y';
-		str[2] = '\0';
-
-		return str;
-	}
-
 	__declspec(dllexport)
 		void
 		ProtectFile(
@@ -213,4 +192,57 @@ extern "C"
 		free(Path);
 		return S_OK;
 	}
+
+	//__declspec(dllexport)
+	//	void
+	//	ProtectFile(
+	//		wchar_t* Path,
+	//		USHORT Length
+	//	)
+	//{
+	//	Path;
+	//	Length;
+	//}
+
+	//__declspec(dllexport)
+	//	HRESULT
+	//	GetNextNotification(
+	//		wchar_t** Path,
+	//		PULONG Pid,
+	//		PULONGLONG MessageId
+	//	)
+	//{
+	//	static wchar_t dummy[] = L"dummy_path";
+
+	//	Sleep(4000);
+
+	//	*Path = dummy;
+	//	*Pid = 4;
+	//	*MessageId = 5;
+
+	//	return S_OK;
+	//}
+
+	//__declspec(dllexport)
+	//HRESULT
+	//BlockAccess(
+	//	ULONGLONG MessageId,
+	//	BOOLEAN Block
+	//)
+	//{
+	//	MessageId;
+	//	Block;
+
+	//	return S_OK;
+	//}
+
+	//__declspec(dllexport)
+	//HRESULT
+	//FreeNotification(
+	//	wchar_t* Path
+	//)
+	//{
+	//	Path;
+	//	return S_OK;
+	//}
 }

@@ -26,7 +26,7 @@ namespace FileProtectorUI
             }
             else
             {
-                return (Path == ((FileDTO)obj).Path) && (Name == ((FileDTO)obj).Name);
+                return (Path == ((FileDTO)obj).Path);
             }
         }
     }

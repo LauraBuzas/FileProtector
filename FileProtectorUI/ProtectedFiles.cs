@@ -24,16 +24,20 @@ namespace FileProtectorUI
 
         public static void AddFile(String path)
         {
-            files.Add(new FileDTO(Path.GetFileName(path), path));
-            String[] paths = new String[files.Count];
-            var index = 0;
-            foreach(FileDTO file in files)
+            FileDTO newFile = new FileDTO(Path.GetFileName(path), path);
+            if (!files.Contains(newFile))
             {
-                paths[index] = file.Path;
-                index++;
-            }
+                files.Add(newFile);
+                String[] paths = new String[files.Count];
+                var index = 0;
+                foreach (FileDTO file in files)
+                {
+                    paths[index] = file.Path;
+                    index++;
+                }
 
-            Registry.SetValue(registryPath, "ProtectedPaths", paths);
+                Registry.SetValue(registryPath, "ProtectedPaths", paths);
+            }
         }
 
         public static void RemoveFile(FileDTO file)

@@ -155,14 +155,14 @@ FpUnloadFunction(
 	_In_ FLT_FILTER_UNLOAD_FLAGS Flags
 )
 {
+	PLIST_ENTRY currentEntry = NULL;
 	UNREFERENCED_PARAMETER(Flags);
 
 	FltCloseClientPort(gFilterHandle, &gClientPort);
 	FltCloseCommunicationPort(gPort);
 	FltUnregisterFilter(gFilterHandle);
-	PLIST_ENTRY currentEntry;
-	currentEntry = gProtectedPaths.Flink;
 
+	currentEntry = gProtectedPaths.Flink;
 	while (currentEntry != &gProtectedPaths)
 	{
 		PLIST_ENTRY removeEntry = currentEntry;
@@ -238,7 +238,6 @@ FpOnClientConnect(
 	UNREFERENCED_PARAMETER(ConnectionContext);
 	UNREFERENCED_PARAMETER(SizeOfContext);
 	UNREFERENCED_PARAMETER(ConnectionPortCookie);
-
 	gClientPort = ClientPort;
 
 	return STATUS_SUCCESS;
@@ -250,6 +249,19 @@ FpOnClientDisconnect(
 	_In_opt_ PVOID ConnectionCookie
 ) 
 {
+	PLIST_ENTRY currentEntry;
+	
+	currentEntry = gProtectedPaths.Flink;
+	while (currentEntry != &gProtectedPaths)
+	{
+		PLIST_ENTRY removeEntry = currentEntry;
+		PPROTECTED_PATH_ENTRY ppe = CONTAINING_RECORD(removeEntry, PROTECTED_PATH_ENTRY, ListEntry);
+		currentEntry = currentEntry->Flink;
+		RemoveEntryList(removeEntry);
+		ExFreePoolWithTag(ppe->Path.Buffer, 'GAT#');
+		ExFreePoolWithTag(ppe, 'EPP#');
+	}
+
 	UNREFERENCED_PARAMETER(ConnectionCookie);
 }
 
