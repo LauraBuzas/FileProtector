@@ -412,8 +412,8 @@ namespace FileProtectorUI
             filesList.ItemsSource = ProtectedFiles.files;
             foreach (var f in ProtectedFiles.files)
             {
-                f.Path = "\\??\\" + f.Path;
-                ProtectFile(f.Path, (ushort)f.Path.Length);
+                var path = "\\??\\" + f.Path;
+                ProtectFile(path, (ushort)path.Length);
             }
         }
 
@@ -457,7 +457,7 @@ namespace FileProtectorUI
                     case "Deny":
                         break;
                     case "More":
-                        allowed = InputPasswordMessageBoxLaunch(path, pid);
+                        allowed = BlockingConsentWindowLaunch(path, pid);
                         break;
                     default:
                         break;
@@ -506,7 +506,7 @@ namespace FileProtectorUI
                     }
                 };
 
-                //adding series will update and animate the chart automatically
+                
                 this.StatsChart.Series.Add(new ColumnSeries
                 {
                     Title = "denied",
@@ -524,36 +524,17 @@ namespace FileProtectorUI
 
             return allowed;
         }
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        private static extern int SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
-        private static readonly int MAX_PATH = 260;
-        private static readonly int SPI_GETDESKWALLPAPER = 0x73;
-        private static readonly int SPI_SETDESKWALLPAPER = 0x14;
-        private static readonly int SPIF_UPDATEINIFILE = 0x01;
-        private static readonly int SPIF_SENDWININICHANGE = 0x02;
-
-        private bool InputPasswordMessageBoxLaunch(string path, ulong pid)
+        
+        private bool BlockingConsentWindowLaunch(string path, ulong pid)
         {
             IntPtr hOldDesktop = GetThreadDesktop(GetCurrentThreadId());
             IntPtr pNewDesktop = CreateDesktop("NewDesktop", IntPtr.Zero, IntPtr.Zero, 0, (uint)DESKTOP_ACCESS.GENERIC_ALL, IntPtr.Zero);
-            //Bitmap bmp = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
-            //bmp.Save("secure_desktop.jpg", ImageFormat.Jpeg);
-
-            //string wallpaper = new string('\0', MAX_PATH);
-            //SystemParametersInfo(SPI_GETDESKWALLPAPER, (int)wallpaper.Length, wallpaper, 0);
-            //wallpaper.Substring(0, wallpaper.IndexOf('\0'));
-
+           
             SwitchDesktop(pNewDesktop);
-            //int ret = 0;
-
             bool allow = false;
             Thread t = new Thread(() =>
             {
                 SetThreadDesktop(pNewDesktop);
-                //ret = SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, wallpaper, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
-                //ret = SystemParametersInfo(SPI_GETDESKWALLPAPER, (int)wallpaper.Length, wallpaper, 0);
-                //wallpaper.Substring(0, wallpaper.IndexOf('\0'));
                 BlockingConsentWindow blockWindow = new BlockingConsentWindow(Process.GetProcessById((int)pid).ProcessName, pid, path);
                 blockWindow.AllowButton.Click += (e, args) =>
                 {
@@ -569,7 +550,6 @@ namespace FileProtectorUI
 
 
                 blockWindow.ShowDialog();
-                //loginWnd.ShowDialog();
             });
             t.SetApartmentState(ApartmentState.STA);
 
@@ -648,14 +628,14 @@ namespace FileProtectorUI
                 if (ComboBlock.Text.Equals("Yes"))
                 {
                     isDefaultBlockingActive = false;
-                    TextBlockBlockGreen.Visibility = Visibility.Hidden;
-                    TextBlockBlockRed.Visibility = Visibility.Visible;
+                    TextBlockBlockGreen.Visibility = Visibility.Visible;
+                    TextBlockBlockRed.Visibility = Visibility.Hidden;
                 }
                 else
                 {
                     isDefaultBlockingActive = true;
-                    TextBlockBlockGreen.Visibility = Visibility.Visible;
-                    TextBlockBlockRed.Visibility = Visibility.Hidden;
+                    TextBlockBlockGreen.Visibility = Visibility.Hidden;
+                    TextBlockBlockRed.Visibility = Visibility.Visible;
                 }
                 Registry.SetValue(Constants.registryPath, "isDefaultBlocking", isDefaultBlockingActive.ToString());
             }

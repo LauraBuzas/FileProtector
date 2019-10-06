@@ -150,7 +150,7 @@
 
                             <TextBlock FontSize="16" Grid.Row="2" Foreground="{StaticResource Foreground}">Blocking all files</TextBlock>
                             <TextBlock Name="TextBlockBlockGreen"  Grid.Row="2" Grid.Column="1" Foreground="Green"  FontFamily="Segoe MDL2 Assets" FontSize="20" Text="&#xE8FB;" HorizontalAlignment="Right"/>
-                            <TextBlock Name="TextBlockBlockRed" Grid.Row="2" Grid.Column="1" Foreground="Red"  FontFamily="Segoe MDL2 Assets" FontSize="20" Text="&#xE783;" HorizontalAlignment="Right"/>
+                            <TextBlock Name="TextBlockBlockRed" Grid.Row="2" Grid.Column="1" Foreground="Yellow"  FontFamily="Segoe MDL2 Assets" FontSize="20" Text="&#xE7BA;" HorizontalAlignment="Right"/>
 
 
                             <TextBlock FontSize="16" Grid.Row="4" Foreground="{StaticResource Foreground}">Monitoring protected files</TextBlock>
@@ -181,7 +181,36 @@
                 </TabItem>
                 <TabItem Header="Help">
                     <TabItem.Content>
-                        <Grid></Grid>
+                        <Grid Margin="50">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="40"/>
+                                <RowDefinition Height="15"/>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="15"/>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="10"/>
+                                <RowDefinition Height="15"/>
+                                <RowDefinition Height="10"/>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="15"/>
+                                <RowDefinition Height="30"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock FontSize="28" Grid.Row="0" Foreground="{StaticResource Foreground}" Grid.ColumnSpan="3">Product version: </TextBlock>
+                            <TextBlock FontSize="25" Grid.Row="0" Grid.Column="1" Foreground="{StaticResource Foreground}" Grid.ColumnSpan="3">1.0</TextBlock>
+
+
+                            <TextBlock FontSize="16" Grid.Row="2" Foreground="{StaticResource Foreground}">General product description:</TextBlock>
+                            <TextBlock FontSize="12" Grid.Row="3" Grid.ColumnSpan="3" Foreground="{StaticResource Foreground}">This product was design to protect users regarding confidentiality, integrity and availability.</TextBlock>
+                            <TextBlock FontSize="12" Grid.Row="4" Grid.ColumnSpan="3" Foreground="{StaticResource Foreground}">A user can add the desired files to be protected and he will be asked for consent every time it will be accessed.
+                            </TextBlock>
+
+                        </Grid>
                     </TabItem.Content>
                 </TabItem>
             </TabControl>
